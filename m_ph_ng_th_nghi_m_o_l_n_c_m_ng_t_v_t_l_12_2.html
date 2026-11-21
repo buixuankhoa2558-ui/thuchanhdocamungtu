@@ -1,0 +1,2940 @@
+<!DOCTYPE html>
+<html lang="vi" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Thí Nghiệm Vật Lí 12: Đo Độ Lớn Cảm Ứng Từ</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Nunito & Fredoka (bo tròn hoàn toàn), JetBrains Mono & Pacifico -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=JetBrains+Mono:wght@500;700;800&family=Nunito:wght@600;700;800;900&family=Pacifico&display=swap" rel="stylesheet" />
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Nunito', 'Fredoka', 'sans-serif'],
+            rounded: ['Fredoka', 'Nunito', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            lab: {
+              bg: '#0b1120',
+              panel: '#111827',
+              card: '#1e293b',
+              border: '#334155',
+            }
+          }
+        }
+      }
+    };
+  </script>
+
+  <style>
+    /* ==================== GLOBAL SKY-BLUE ROUNDED THEME ==================== */
+    body {
+      font-family: 'Nunito', 'Fredoka', sans-serif;
+      background: #ffffff;
+      color: #ffffff;
+      overflow: hidden;
+      transition: background 0.35s ease, color 0.25s ease;
+    }
+
+    .sky-main-app {
+      background: linear-gradient(180deg, #38bdf8 0%, #60a5fa 48%, #7dd3fc 100%);
+      transition: background 0.35s ease, color 0.25s ease;
+    }
+
+    /* Chế độ bầu trời chiều/đêm nếu người dùng bấm nút đổi tông */
+    html.sky-night .sky-main-app {
+      background: linear-gradient(180deg, #0284c7 0%, #0369a1 52%, #0ea5e9 100%);
+    }
+
+    /* Phông chữ bo tròn màu trắng viền đen nhẹ, không góc nhọn cho toàn bộ giao diện chính */
+    .sky-main-app,
+    .sky-main-app h1,
+    .sky-main-app h2,
+    .sky-main-app h3,
+    .sky-main-app p,
+    .sky-main-app span,
+    .sky-main-app label,
+    .sky-main-app button,
+    .sky-main-app summary,
+    .sky-main-app th,
+    .sky-main-app td {
+      font-family: 'Nunito', 'Fredoka', sans-serif;
+      color: #ffffff;
+      text-shadow:
+        -1px -1px 0 rgba(15, 23, 42, 0.72),
+         1px -1px 0 rgba(15, 23, 42, 0.72),
+        -1px  1px 0 rgba(15, 23, 42, 0.72),
+         1px  1px 0 rgba(15, 23, 42, 0.72),
+         0px  1.5px 2px rgba(15, 23, 42, 0.45);
+    }
+
+    /* Giữ số liệu dễ đọc nhưng vẫn bo tròn và viền đen nhẹ */
+    .sky-main-app .font-mono {
+      font-family: 'Nunito', 'Fredoka', sans-serif;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: 0.015em;
+    }
+
+    /* Đảm bảo input có nền trong suốt nhẹ, bo tròn hoàn toàn và chữ trắng viền đen rõ nét */
+    .sky-main-app input[type="number"],
+    .sky-main-app input[type="text"] {
+      background: rgba(15, 23, 42, 0.32) !important;
+      border: 1.5px solid rgba(255, 255, 255, 0.55) !important;
+      border-radius: 999px !important;
+      color: #ffffff !important;
+      text-shadow: 0 1px 2px rgba(15, 23, 42, 0.7);
+    }
+    .sky-main-app input::placeholder {
+      color: rgba(255, 255, 255, 0.78);
+    }
+
+    /* Biến tất cả các thẻ/khung trên trang chính thành kính xanh bầu trời bo tròn hoàn toàn */
+    .sky-card {
+      background: rgba(255, 255, 255, 0.20) !important;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1.5px solid rgba(255, 255, 255, 0.48) !important;
+      border-radius: 26px !important;
+      box-shadow: 0 12px 30px -8px rgba(3, 105, 161, 0.28) !important;
+    }
+
+    .sky-subcard {
+      background: rgba(14, 116, 144, 0.22) !important;
+      border: 1.5px solid rgba(255, 255, 255, 0.38) !important;
+      border-radius: 20px !important;
+    }
+
+    .sky-pill-btn {
+      border-radius: 999px !important;
+    }
+
+    /* Không loại trừ SVG text khỏi style SVG gốc */
+    .sky-main-app svg text {
+      text-shadow: none;
+    }
+
+    /* Custom Range Slider Styling (bo tròn hoàn toàn) */
+    input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      background: transparent;
+      cursor: pointer;
+    }
+    input[type="range"]::-webkit-slider-runnable-track {
+      height: 8px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.45);
+      border: 1px solid rgba(15, 23, 42, 0.22);
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 999px;
+      background: #ffffff;
+      border: 2.5px solid #0284c7;
+      margin-top: -7px;
+      box-shadow: 0 2px 8px rgba(15, 23, 42, 0.35);
+      transition: transform 0.15s ease;
+    }
+    input[type="range"]::-webkit-slider-thumb:hover {
+      transform: scale(1.16);
+    }
+
+    /* Animated current flow dashes */
+    @keyframes flowForward {
+      from { stroke-dashoffset: 24; }
+      to { stroke-dashoffset: 0; }
+    }
+    @keyframes flowReverse {
+      from { stroke-dashoffset: 0; }
+      to { stroke-dashoffset: 24; }
+    }
+    .current-flow-forward {
+      stroke-dasharray: 6 18;
+      animation: flowForward 0.6s linear infinite;
+    }
+    .current-flow-reverse {
+      stroke-dasharray: 6 18;
+      animation: flowReverse 0.6s linear infinite;
+    }
+
+    /* Pulse ring for highlighted lab actions (e.g., TARE, Switch K) */
+    @keyframes pulseHighlight {
+      0%, 100% { stroke-opacity: 1; transform: scale(1); }
+      50% { stroke-opacity: 0.35; transform: scale(1.06); }
+    }
+    .svg-pulse {
+      transform-box: fill-box;
+      transform-origin: center;
+      animation: pulseHighlight 1.3s ease-in-out infinite;
+    }
+
+    /* LCD digital glow */
+    .lcd-text {
+      font-family: 'JetBrains Mono', monospace;
+      text-shadow: 0 0 8px rgba(52, 211, 153, 0.45);
+    }
+
+    /* Hide scrollbar for horizontal stepper on mobile */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    /* ==================== INTRO / WELCOME OVERLAY STYLES ==================== */
+    .font-script-greeting {
+      font-family: 'Pacifico', cursive;
+    }
+
+    .intro-overlay {
+      background:
+        radial-gradient(circle at 18% 18%, rgba(14, 165, 233, 0.08), transparent 42%),
+        radial-gradient(circle at 82% 80%, rgba(15, 23, 42, 0.06), transparent 45%),
+        linear-gradient(160deg, #ffffff 0%, #f6f8fb 55%, #eef2f7 100%);
+      transition: opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+                  transform 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+                  visibility 0.6s ease;
+    }
+
+    .intro-overlay.is-hidden {
+      opacity: 0;
+      transform: scale(1.03);
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    /* Smooth Greeting Entrance */
+    @keyframes greetingFadeSlide {
+      0% {
+        opacity: 0;
+        transform: translateY(22px) scale(0.96);
+        filter: blur(4px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        filter: blur(0);
+      }
+    }
+
+    .greeting-animate {
+      opacity: 0;
+      animation: greetingFadeSlide 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    /* Diagonal Staggered Left-to-Right Member Entrance */
+    .member-card {
+      opacity: 0;
+      --diag-y: 0px;
+      --diag-x: 0px;
+      transform: translate3d(calc(var(--diag-x) - 56px), calc(var(--diag-y) - 18px), 0) scale(0.94);
+      will-change: transform, opacity;
+      transition: box-shadow 0.25s ease, border-color 0.25s ease, background-color 0.25s ease;
+    }
+
+    @keyframes memberDiagonalGlide {
+      0% {
+        opacity: 0;
+        transform: translate3d(calc(var(--diag-x) - 56px), calc(var(--diag-y) - 18px), 0) scale(0.94);
+      }
+      100% {
+        opacity: 1;
+        transform: translate3d(var(--diag-x), var(--diag-y), 0) scale(1);
+      }
+    }
+
+    .member-card.is-entering {
+      animation: memberDiagonalGlide 0.72s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    /* Mobile-friendly gentle horizontal diagonal stagger without overflow */
+    @media (max-width: 639px) {
+      .member-card {
+        --diag-y: 0px !important;
+      }
+    }
+
+    /* Pure White Start Button with refined tactile elevation */
+    .btn-start-white {
+      background: #ffffff;
+      color: #0c213d;
+      border: 1.5px solid rgba(15, 23, 42, 0.1);
+      box-shadow: 0 10px 28px -6px rgba(12, 33, 61, 0.16), 0 2px 6px rgba(12, 33, 61, 0.06);
+      transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+                  box-shadow 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+                  border-color 0.28s ease;
+    }
+    .btn-start-white:hover {
+      transform: translateY(-3px) scale(1.02);
+      border-color: rgba(14, 165, 233, 0.45);
+      box-shadow: 0 16px 36px -6px rgba(14, 165, 233, 0.24), 0 4px 10px rgba(12, 33, 61, 0.08);
+    }
+    .btn-start-white:active {
+      transform: translateY(0) scale(0.98);
+    }
+
+    /* ==================== SCREEN 2: PURE WHITE STAR & NEON "TỔ 2" TRANSITION ==================== */
+    .star-transition-overlay {
+      background: #ffffff;
+      transition: opacity 0.65s cubic-bezier(0.22, 1, 0.36, 1),
+                  transform 0.65s cubic-bezier(0.22, 1, 0.36, 1),
+                  visibility 0.65s ease;
+    }
+    .star-transition-overlay.is-hidden {
+      opacity: 0;
+      transform: scale(1.04);
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    /* Ngôi sao lúc đầu bự ở trung tâm, quay tròn chậm và thu nhỏ dần mượt mà */
+    @keyframes starBigToSmallSpin {
+      0% {
+        opacity: 0;
+        transform: translateY(58px) scale(2.85) rotate(0deg);
+      }
+      16% {
+        opacity: 1;
+        transform: translateY(48px) scale(2.65) rotate(65deg);
+      }
+      72% {
+        opacity: 1;
+        transform: translateY(0px) scale(0.76) rotate(290deg);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0px) scale(0.68) rotate(360deg);
+      }
+    }
+
+    /* Sau khi thu nhỏ, ngôi sao tiếp tục quay tròn chậm cực êm */
+    @keyframes starContinuousSlowSpin {
+      from { transform: translateY(0px) scale(0.68) rotate(0deg); }
+      to   { transform: translateY(0px) scale(0.68) rotate(360deg); }
+    }
+
+    .star-morph-wrap {
+      opacity: 0;
+      transform-origin: center center;
+      will-change: transform, opacity;
+    }
+    .star-morph-wrap.is-playing {
+      animation:
+        starBigToSmallSpin 2.5s cubic-bezier(0.22, 1, 0.36, 1) forwards,
+        starContinuousSlowSpin 14s linear 2.5s infinite;
+    }
+
+    /* Tựa đề "Tổ 2" lớn, in đậm, bo tròn không góc nhọn, sắc màu neon rực rỡ */
+    @keyframes neonTitlePop {
+      0% {
+        opacity: 0;
+        transform: translateY(28px) scale(0.84);
+        filter: blur(8px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        filter: blur(0);
+      }
+    }
+
+    .neon-to2-title {
+      font-family: 'Fredoka', 'Nunito', sans-serif;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      background: linear-gradient(90deg, #00d2ff 0%, #7c3aed 36%, #ff2a9d 70%, #00e5ff 100%);
+      background-size: 220% auto;
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      filter:
+        drop-shadow(0 0 10px rgba(0, 210, 255, 0.55))
+        drop-shadow(0 0 22px rgba(255, 42, 157, 0.42));
+      opacity: 0;
+    }
+
+    @keyframes neonGradientFlow {
+      0%   { background-position: 0% 50%; }
+      50%  { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .neon-to2-title.is-playing {
+      animation:
+        neonTitlePop 0.95s cubic-bezier(0.22, 1, 0.36, 1) 1.35s forwards,
+        neonGradientFlow 5.5s ease-in-out 2.3s infinite;
+    }
+
+    .transition-cta-reveal {
+      opacity: 0;
+      transform: translateY(18px);
+    }
+    .transition-cta-reveal.is-playing {
+      animation: neonTitlePop 0.8s cubic-bezier(0.22, 1, 0.36, 1) 1.85s forwards;
+    }
+
+    /* Nút tiếp tục vào trang web chính (bo tròn hoàn toàn, hiệu ứng neon dịu) */
+    .btn-continue-neon {
+      font-family: 'Fredoka', 'Nunito', sans-serif;
+      background: #ffffff;
+      color: #0c213d;
+      border: 2px solid rgba(14, 165, 233, 0.45);
+      border-radius: 999px;
+      box-shadow:
+        0 10px 30px -6px rgba(14, 165, 233, 0.32),
+        0 0 18px rgba(255, 42, 157, 0.16);
+      transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+                  box-shadow 0.28s ease,
+                  border-color 0.28s ease;
+    }
+    .btn-continue-neon:hover {
+      transform: translateY(-3px) scale(1.03);
+      border-color: rgba(236, 72, 153, 0.65);
+      box-shadow:
+        0 14px 36px -6px rgba(124, 58, 237, 0.35),
+        0 0 24px rgba(0, 210, 255, 0.38);
+    }
+
+    /* ==================== BOTTOM CONTINUOUS DISSOLVING MEMBER TICKER ==================== */
+    .member-ticker-bar {
+      background: rgba(2, 132, 199, 0.42);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-top: 1.5px solid rgba(255, 255, 255, 0.45);
+    }
+
+    .ticker-stage {
+      position: relative;
+      overflow: hidden;
+      height: 44px;
+      mask-image: linear-gradient(90deg, transparent 0%, #000 5%, #000 95%, transparent 100%);
+      -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 5%, #000 95%, transparent 100%);
+    }
+
+    .ticker-member-item {
+      position: absolute;
+      top: 50%;
+      left: 0;
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      font-family: 'Fredoka', 'Nunito', sans-serif;
+      font-weight: 700;
+      font-size: 1rem;
+      will-change: transform, opacity;
+      pointer-events: none;
+    }
+
+    .ticker-char {
+      display: inline-block;
+      transition:
+        opacity 0.9s cubic-bezier(0.4, 0, 0.2, 1),
+        filter 0.9s cubic-bezier(0.4, 0, 0.2, 1),
+        transform 0.9s cubic-bezier(0.4, 0, 0.2, 1);
+      will-change: opacity, filter, transform;
+    }
+
+    /* Hiệu ứng tiêu biến các nét chữ nhẹ nhàng */
+    .ticker-member-item.is-dissolving .ticker-char {
+      opacity: 0;
+      filter: blur(6px);
+      transform: translateY(-9px) scale(0.84);
+    }
+
+    /* ==================== DIRECTIONAL PAGE SLIDE ENGINE (4 PAGES) ==================== */
+    .slide-page {
+      position: fixed;
+      inset: 0;
+      overflow-y: auto;
+      overflow-x: hidden;
+      will-change: transform, opacity;
+      transition:
+        transform 0.68s cubic-bezier(0.22, 1, 0.36, 1),
+        opacity 0.52s cubic-bezier(0.22, 1, 0.36, 1),
+        visibility 0.68s ease;
+    }
+    .slide-page.no-transition {
+      transition: none !important;
+    }
+    .slide-page.page-active {
+      transform: translate3d(0, 0, 0);
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+      z-index: 30;
+    }
+    .slide-page.page-left {
+      transform: translate3d(-100%, 0, 0);
+      opacity: 0.2;
+      visibility: hidden;
+      pointer-events: none;
+      z-index: 20;
+    }
+    .slide-page.page-right {
+      transform: translate3d(100%, 0, 0);
+      opacity: 0.2;
+      visibility: hidden;
+      pointer-events: none;
+      z-index: 20;
+    }
+
+    /* ==================== SCREEN 4: THANK YOU OVERLAY (NỀN TRẮNG CHỮ TRÒN HIỆN TỪ TRÁI QUA) ==================== */
+    .thankyou-overlay {
+      background:
+        radial-gradient(circle at 20% 20%, rgba(14, 165, 233, 0.08), transparent 44%),
+        radial-gradient(circle at 82% 80%, rgba(12, 33, 61, 0.06), transparent 46%),
+        linear-gradient(160deg, #ffffff 0%, #f8fafc 55%, #eef2f7 100%);
+    }
+
+    /* Hiệu ứng hiện dần từ bên trái qua mượt mà (wipe + glide) */
+    @keyframes thankYouRevealLTR {
+      0% {
+        opacity: 0;
+        clip-path: inset(0 100% 0 0);
+        transform: translate3d(-34px, 0, 0);
+        filter: blur(3px);
+      }
+      30% {
+        opacity: 1;
+      }
+      100% {
+        opacity: 1;
+        clip-path: inset(0 0% 0 0);
+        transform: translate3d(0, 0, 0);
+        filter: blur(0);
+      }
+    }
+
+    .thankyou-ltr {
+      opacity: 0;
+      clip-path: inset(0 100% 0 0);
+      transform: translate3d(-34px, 0, 0);
+      will-change: transform, opacity, clip-path;
+    }
+
+    .thankyou-ltr.is-revealing {
+      animation: thankYouRevealLTR 1.05s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    /* Chữ bo tròn mềm mại đồng bộ phong cách "xin chào" */
+    .thankyou-script {
+      font-family: 'Pacifico', 'Fredoka', cursive;
+      color: #0c213d;
+      text-shadow: 0 3px 14px rgba(12, 33, 61, 0.09);
+    }
+    .thankyou-rounded-sub {
+      font-family: 'Fredoka', 'Nunito', sans-serif;
+      font-weight: 700;
+      color: #111317;
+      letter-spacing: 0.015em;
+    }
+
+    /* ==================== FLOATING DIRECTIONAL PAGE NAVIGATION DOCK ==================== */
+    .page-nav-dock {
+      position: fixed;
+      left: 50%;
+      bottom: 14px;
+      transform: translateX(-50%);
+      z-index: 60;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      transition:
+        bottom 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+        background 0.35s ease,
+        border-color 0.35s ease,
+        box-shadow 0.35s ease;
+    }
+
+    /* Giao diện dock trên các trang nền trắng (Trang 1, 2, 4) */
+    .page-nav-dock.dock-light {
+      background: rgba(255, 255, 255, 0.92);
+      border: 1.5px solid rgba(15, 23, 42, 0.12);
+      box-shadow: 0 10px 30px -8px rgba(12, 33, 61, 0.18);
+      color: #0c213d;
+    }
+    .page-nav-dock.dock-light .dock-btn {
+      background: #f8fafc;
+      color: #0c213d;
+      border: 1px solid rgba(15, 23, 42, 0.12);
+    }
+    .page-nav-dock.dock-light .dock-btn:hover:not(:disabled) {
+      background: #e0f2fe;
+      border-color: #38bdf8;
+      color: #0369a1;
+    }
+    .page-nav-dock.dock-light .dock-dot {
+      background: #cbd5e1;
+    }
+    .page-nav-dock.dock-light .dock-dot.is-active {
+      background: #0284c7;
+      width: 22px;
+    }
+
+    /* Giao diện dock trên trang thực hành nền xanh bầu trời (Trang 3) - nhấc cao hơn thanh chạy tên */
+    .page-nav-dock.dock-sky {
+      bottom: 54px;
+      background: rgba(2, 132, 199, 0.72);
+      border: 1.5px solid rgba(255, 255, 255, 0.6);
+      box-shadow: 0 10px 28px -6px rgba(3, 105, 161, 0.45);
+      color: #ffffff;
+    }
+    .page-nav-dock.dock-sky .dock-btn {
+      background: rgba(255, 255, 255, 0.22);
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.55);
+      text-shadow:
+        -1px -1px 0 rgba(15, 23, 42, 0.65),
+         1px -1px 0 rgba(15, 23, 42, 0.65),
+        -1px  1px 0 rgba(15, 23, 42, 0.65),
+         1px  1px 0 rgba(15, 23, 42, 0.65);
+    }
+    .page-nav-dock.dock-sky .dock-btn:hover:not(:disabled) {
+      background: rgba(255, 255, 255, 0.38);
+    }
+    .page-nav-dock.dock-sky .dock-dot {
+      background: rgba(255, 255, 255, 0.45);
+    }
+    .page-nav-dock.dock-sky .dock-dot.is-active {
+      background: #ffffff;
+      width: 22px;
+      box-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
+    }
+
+    .dock-btn {
+      font-family: 'Fredoka', 'Nunito', sans-serif;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 6px 13px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease, opacity 0.2s ease;
+      white-space: nowrap;
+    }
+    .dock-btn:active:not(:disabled) {
+      transform: scale(0.95);
+    }
+    .dock-btn:disabled {
+      opacity: 0.36;
+      cursor: not-allowed;
+    }
+
+    .dock-dot {
+      height: 8px;
+      width: 8px;
+      border-radius: 999px;
+      border: none;
+      padding: 0;
+      cursor: pointer;
+      transition: width 0.3s cubic-bezier(0.22, 1, 0.36, 1), background 0.3s ease;
+    }
+  </style>
+</head>
+<body class="min-h-screen overflow-hidden">
+
+  <!-- ==================== INTRO / WELCOME PRESENTATION SCREEN (TRANG 1 - TỔ HAI) ==================== -->
+  <section id="intro-overlay" aria-label="Giao diện mở đầu Tổ 2" class="intro-overlay slide-page page-active flex flex-col items-center justify-between px-4 sm:px-8 py-6 sm:py-10 pb-24 text-slate-900">
+    <!-- Subtle Decorative Magnetic Field Arcs (Background Texture) -->
+    <svg class="pointer-events-none fixed inset-0 w-full h-full opacity-[0.045]" preserveAspectRatio="none" viewBox="0 0 1440 900" fill="none">
+      <path d="M-80 260 C 320 120, 620 420, 1520 180" stroke="#0c213d" stroke-width="2" stroke-dasharray="10 10"/>
+      <path d="M-80 540 C 420 720, 880 340, 1520 620" stroke="#0c213d" stroke-width="2" stroke-dasharray="10 10"/>
+      <circle cx="1220" cy="180" r="190" stroke="#0284c7" stroke-width="1.5"/>
+      <circle cx="210" cy="720" r="150" stroke="#0c213d" stroke-width="1.5"/>
+    </svg>
+
+    <!-- Top Subtle Subject Tag -->
+    <div class="relative z-10 w-full max-w-6xl flex items-center justify-between">
+      <span class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/85 border border-slate-200/90 shadow-sm text-[11px] sm:text-xs font-semibold text-slate-600">
+        <span class="w-2 h-2 rounded-full bg-sky-500"></span>
+        Vật Lí 12 (KNTT) • Thực hành đo độ lớn cảm ứng từ
+      </span>
+      <button id="btn-replay-intro" type="button" title="Phát lại hiệu ứng xuất hiện thành viên" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/85 hover:bg-white border border-slate-200/90 shadow-sm text-[11px] sm:text-xs font-semibold text-slate-600 hover:text-sky-700 transition">
+        <span>↻</span>
+        <span class="hidden sm:inline">Phát lại hiệu ứng</span>
+      </button>
+    </div>
+
+    <!-- Center Hero: "xin chào / tổ hai" + Diagonal Staggered Team Members -->
+    <div class="relative z-10 w-full max-w-6xl my-auto py-4 sm:py-6 flex flex-col items-center">
+      <!-- Greeting Header matching reference image -->
+      <div id="intro-greeting" class="text-center mb-6 sm:mb-9 select-none">
+        <h1 class="greeting-animate font-script-greeting text-5xl sm:text-7xl md:text-8xl leading-[1.15] tracking-normal text-[#0c213d] drop-shadow-[0_2px_10px_rgba(12,33,61,0.08)]" style="animation-delay: 0.05s;">
+          xin chào
+        </h1>
+        <p class="greeting-animate font-script-greeting text-3xl sm:text-5xl md:text-6xl leading-[1.2] text-[#111317] mt-1 sm:mt-2" style="animation-delay: 0.22s;">
+          tổ hai
+        </p>
+        <div class="greeting-animate mt-3 sm:mt-4 inline-flex items-center gap-2 text-xs sm:text-sm font-semibold text-slate-500 tracking-wide uppercase" style="animation-delay: 0.36s;">
+          <span class="w-6 h-[1.5px] bg-slate-300"></span>
+          <span>Thành viên nhóm thuyết trình</span>
+          <span class="w-6 h-[1.5px] bg-slate-300"></span>
+        </div>
+      </div>
+
+      <!-- 12 Team Members arranged in smooth Left-to-Right Diagonal Cascade -->
+      <div id="intro-members-grid" class="w-full max-w-5xl grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-x-5 lg:gap-y-7 pb-4 lg:pb-12 px-1 sm:px-2">
+        <!-- Populated dynamically with diagonal offsets by renderIntroMembers() -->
+      </div>
+
+      <!-- Pure White Start Button -->
+      <div id="intro-cta-wrap" class="greeting-animate mt-5 sm:mt-7 flex flex-col items-center gap-2.5" style="animation-delay: 0.5s;">
+        <button id="btn-start-lab" type="button" class="btn-start-white group inline-flex items-center gap-3 px-9 sm:px-11 py-3.5 sm:py-4 rounded-full text-sm sm:text-base font-extrabold tracking-wide cursor-pointer">
+          <span>Bắt đầu</span>
+          <span class="w-7 h-7 rounded-full bg-slate-100 group-hover:bg-sky-50 flex items-center justify-center text-[#0c213d] group-hover:text-sky-600 transition-transform duration-300 group-hover:translate-x-1">
+            →
+          </span>
+        </button>
+        <p class="text-[11px] sm:text-xs font-medium text-slate-400">
+          Nhấn <strong class="text-slate-600">Bắt đầu</strong> để vào phòng thí nghiệm mô phỏng
+        </p>
+      </div>
+    </div>
+
+    <!-- Bottom spacer for balanced vertical centering -->
+    <div class="relative z-10 h-2"></div>
+  </section>
+
+  <!-- ==================== SCREEN 2: PURE WHITE STAR & NEON "TỔ 2" TRANSITION ==================== -->
+  <section id="star-transition-overlay" aria-label="Màn hình chuyển tiếp Tổ 2" class="star-transition-overlay slide-page page-right flex flex-col items-center justify-center px-6 py-8 pb-24 text-center select-none">
+    <!-- Top Back Button -->
+    <div class="absolute top-5 left-5 right-5 max-w-6xl mx-auto flex items-center justify-between">
+      <button id="btn-star-back-intro" type="button" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-slate-50 hover:bg-slate-100 border border-slate-200 text-xs sm:text-sm font-bold text-slate-600 transition cursor-pointer">
+        <span>←</span>
+        <span>Quay lại mở đầu</span>
+      </button>
+      <button id="btn-replay-star" type="button" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-slate-50 hover:bg-slate-100 border border-slate-200 text-xs sm:text-sm font-bold text-slate-600 transition cursor-pointer">
+        <span>↻</span>
+        <span>Xem lại ngôi sao</span>
+      </button>
+    </div>
+
+    <!-- Center Morphing Star + Neon Rounded "Tổ 2" + Continue Button -->
+    <div class="relative flex flex-col items-center justify-center max-w-2xl mx-auto">
+      <!-- Rotating Big-to-Small Rounded Star -->
+      <div id="star-morph-wrap" class="star-morph-wrap w-36 h-36 sm:w-44 sm:h-44 flex items-center justify-center">
+        <svg viewBox="0 0 200 200" class="w-full h-full overflow-visible" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="neonStarGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#00e5ff"/>
+              <stop offset="50%" stop-color="#a855f7"/>
+              <stop offset="100%" stop-color="#ff2a9d"/>
+            </linearGradient>
+            <filter id="starNeonGlow" x="-40%" y="-40%" width="180%" height="180%">
+              <feGaussianBlur stdDeviation="6" result="blur"/>
+              <feMerge>
+                <feMergeNode in="blur"/>
+                <feMergeNode in="SourceGraphic"/>
+              </feMerge>
+            </filter>
+          </defs>
+          <!-- Softly rounded 5-point star (stroke-linejoin="round" + thick rounded stroke = zero sharp corners) -->
+          <path
+            d="M100 22 L122 72 L176 78 L135 114 L147 168 L100 139 L53 168 L65 114 L24 78 L78 72 Z"
+            fill="url(#neonStarGrad)"
+            stroke="url(#neonStarGrad)"
+            stroke-width="18"
+            stroke-linejoin="round"
+            stroke-linecap="round"
+            filter="url(#starNeonGlow)"
+          />
+          <!-- Inner bright soft highlight -->
+          <circle cx="100" cy="102" r="20" fill="#ffffff" fill-opacity="0.45"/>
+        </svg>
+      </div>
+
+      <!-- Large Bold Rounded Neon "Tổ 2" Title -->
+      <h2 id="neon-to2-title" class="neon-to2-title text-7xl sm:text-8xl md:text-9xl leading-none mt-1 sm:mt-2">
+        Tổ 2
+      </h2>
+
+      <!-- Subtitle & Continue Button -->
+      <div id="transition-cta-wrap" class="transition-cta-reveal mt-6 sm:mt-8 flex flex-col items-center gap-4">
+        <p class="font-rounded text-sm sm:text-base font-semibold text-slate-500 max-w-md">
+          Sẵn sàng bước vào phòng thí nghiệm thực hành đo độ lớn cảm ứng từ!
+        </p>
+        <button id="btn-continue-lab" type="button" class="btn-continue-neon group inline-flex items-center gap-3 px-9 sm:px-11 py-3.5 sm:py-4 text-base sm:text-lg font-bold cursor-pointer">
+          <span>Tiếp tục vào thực hành</span>
+          <span class="w-8 h-8 rounded-full bg-sky-50 group-hover:bg-pink-50 flex items-center justify-center text-sky-600 group-hover:text-pink-600 transition-transform duration-300 group-hover:translate-x-1">
+            →
+          </span>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== TOAST NOTIFICATION CONTAINER ==================== -->
+  <div id="toast-container" class="fixed top-20 right-4 z-[70] flex flex-col gap-2 pointer-events-none"></div>
+
+  <!-- ==================== MAIN SKY-BLUE LAB WRAPPER (TRANG 3) ==================== -->
+  <div id="main-lab-wrapper" class="sky-main-app slide-page page-right flex flex-col">
+
+  <!-- ==================== TOP HEADER BAR ==================== -->
+  <header class="sticky top-0 z-40 border-b border-white/40 bg-sky-500/55 backdrop-blur-md shadow-sm">
+    <!-- Top Prominent Topic Banner -->
+    <div class="w-full bg-sky-600/45 border-b border-white/30 px-3 sm:px-6 py-2 text-center">
+      <div class="max-w-[1600px] mx-auto inline-flex flex-wrap items-center justify-center gap-2">
+        <span class="px-3 py-0.5 rounded-full bg-white/25 border border-white/50 text-[11px] sm:text-xs font-extrabold uppercase tracking-wider">
+          Chủ đề thực hiện
+        </span>
+        <span class="text-sm sm:text-lg md:text-xl font-black tracking-wide">
+          THÍ NGHIỆM THỰC HÀNH VẬT LÍ 12: ĐO ĐỘ LỚN CẢM ỨNG TỪ
+        </span>
+      </div>
+    </div>
+
+    <div class="max-w-[1600px] mx-auto px-3 sm:px-5 py-2.5 flex flex-wrap items-center justify-between gap-3">
+      <!-- Brand / Title -->
+      <div class="flex items-center gap-2.5">
+        <div class="w-10 h-10 rounded-full bg-white/25 border border-white/50 flex items-center justify-center text-white shadow-md shrink-0">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <path d="M4 6v6a8 8 0 0 0 16 0V6" stroke-linecap="round"/>
+            <path d="M4 6h4v4H4zM16 6h4v4h-4z" fill="currentColor" fill-opacity="0.25"/>
+          </svg>
+        </div>
+        <div>
+          <h1 class="text-sm sm:text-base font-extrabold tracking-tight leading-tight">
+            Đo Độ Lớn Cảm Ứng Từ <span class="hidden sm:inline font-bold">— Vật Lí 12 (KNTT)</span>
+          </h1>
+          <p class="text-[11px] font-bold opacity-95">
+            Phòng thí nghiệm ảo mô phỏng lực từ &amp; cân điện tử chính xác 0.01 g
+          </p>
+        </div>
+      </div>
+
+      <!-- Global Mode Toggles -->
+      <div class="flex flex-wrap items-center gap-2">
+        <!-- Return to Intro / Greeting Screen Button -->
+        <button id="btn-back-intro" type="button" title="Quay lại màn hình mở đầu Tổ 2" class="sky-pill-btn inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-extrabold border border-white/50 bg-white/20 hover:bg-white/35 shadow-sm transition">
+          <span>👋</span>
+          <span>Mở đầu (Tổ 2)</span>
+        </button>
+
+        <!-- Go to Thank You Ending Screen Button -->
+        <button id="btn-go-thankyou" type="button" title="Chuyển tới trang Xin cảm ơn đã lắng nghe" class="sky-pill-btn inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-extrabold border border-white/50 bg-emerald-500/55 hover:bg-emerald-500/75 shadow-sm transition">
+          <span>🙏</span>
+          <span>Cảm ơn →</span>
+        </button>
+
+        <!-- Guided vs Free Mode -->
+        <div class="inline-flex rounded-full bg-white/20 p-1 border border-white/45 text-xs font-bold">
+          <button id="btn-mode-guided" class="px-3 py-1 rounded-full bg-sky-600/80 shadow-sm transition">
+            Hướng dẫn
+          </button>
+          <button id="btn-mode-free" class="px-3 py-1 rounded-full hover:bg-white/20 transition">
+            Tự do
+          </button>
+        </div>
+
+        <!-- Quiz / Hide B_true Mode -->
+        <button id="btn-toggle-quiz" class="sky-pill-btn inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-bold border border-amber-200/70 bg-amber-400/35 hover:bg-amber-400/50 transition">
+          <span id="quiz-icon">👁️</span>
+          <span id="quiz-label">Hiện B thật: 0.045 T</span>
+        </button>
+
+        <!-- Sky Tone Toggle -->
+        <button id="btn-theme" title="Đổi tông nền xanh bầu trời" class="w-9 h-9 rounded-full border border-white/50 bg-white/20 hover:bg-white/35 transition text-sm flex items-center justify-center">
+          <span id="theme-icon">🌤️</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- ==================== 1. TOP STEPPER BAR ==================== -->
+    <div class="border-t border-white/30 bg-sky-400/30">
+      <div class="max-w-[1600px] mx-auto px-3 sm:px-5 py-2 overflow-x-auto no-scrollbar">
+        <div id="stepper-bar" class="flex items-center justify-between gap-2 min-w-[680px]">
+          <!-- Populated dynamically by JS -->
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ==================== MAIN WORKSPACE (60% STAGE / 40% PANEL) ==================== -->
+  <main class="flex-1 max-w-[1600px] w-full mx-auto px-3 sm:px-5 py-4 pb-20 grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
+
+    <!-- ==================== 2. CENTER STAGE (60% -> 7/12 cols) ==================== -->
+    <section class="lg:col-span-7 flex flex-col gap-3.5">
+
+      <!-- Contextual Step Explanation Banner -->
+      <div id="step-guide-card" class="sky-card p-3.5 transition-all">
+        <div class="flex items-start justify-between gap-3">
+          <div class="flex items-start gap-2.5">
+            <span id="step-badge" class="shrink-0 w-8 h-8 rounded-full bg-sky-600/80 border border-white/60 font-extrabold text-xs flex items-center justify-center shadow">1</span>
+            <div>
+              <h2 id="step-title" class="text-sm font-extrabold">
+                Bước 1: Lắp đặt &amp; Căn chỉnh góc (α = 90°)
+              </h2>
+              <p id="step-desc" class="text-xs sm:text-sm mt-0.5 leading-relaxed font-semibold">
+                Hạ khung dây vào khe giữa hai cực nam châm chữ U đặt trên cân điện tử sao cho khung dây không chạm vào nam châm và vuông góc với đường sức từ.
+              </p>
+            </div>
+          </div>
+          <div class="flex items-center gap-1.5 shrink-0">
+            <button id="btn-prev-step" class="sky-pill-btn px-3 py-1.5 text-xs font-bold bg-white/25 border border-white/50 hover:bg-white/40 transition disabled:opacity-40">
+              ← Trước
+            </button>
+            <button id="btn-next-step" class="sky-pill-btn px-3 py-1.5 text-xs font-bold bg-sky-600/85 hover:bg-sky-500/90 border border-white/50 shadow-sm transition disabled:opacity-40">
+              Tiếp →
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main 2.5D / SVG Simulation Stage -->
+      <div class="sky-card relative overflow-hidden">
+        <!-- Stage Top Overlay Controls -->
+        <div class="flex flex-wrap items-center justify-between gap-2 px-4 py-2.5 border-b border-white/35 bg-white/10">
+          <div class="flex items-center gap-2 text-xs font-bold">
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-300 border border-white animate-pulse"></span>
+            Sân khấu thí nghiệm 2.5D
+          </div>
+          <div class="flex flex-wrap items-center gap-1.5">
+            <button id="btn-coil-pos" class="sky-pill-btn px-3 py-1 text-xs font-bold border border-white/50 bg-white/20 hover:bg-white/35 transition">
+              ⬇️ Hạ khung dây
+            </button>
+            <button id="btn-toggle-bfield" class="sky-pill-btn px-3 py-1 text-xs font-bold border border-white/50 bg-sky-600/50 hover:bg-sky-600/70 transition">
+              🧲 Đường sức B: BẬT
+            </button>
+            <button id="btn-toggle-lhr" class="sky-pill-btn px-3 py-1 text-xs font-bold border border-white/50 bg-purple-500/45 hover:bg-purple-500/65 transition">
+              🖐️ Quy tắc bàn tay trái
+            </button>
+          </div>
+        </div>
+
+        <!-- SVG Canvas -->
+        <div class="relative w-full bg-gradient-to-b from-slate-100 to-slate-200/70 dark:from-[#0d1526] dark:to-[#090f1d] select-none">
+          <svg id="lab-svg" viewBox="0 0 840 500" class="w-full h-auto block" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <!-- Subtle Lab Grid -->
+              <pattern id="labGrid" width="28" height="28" patternUnits="userSpaceOnUse">
+                <path d="M 28 0 L 0 0 0 28" fill="none" stroke="currentColor" stroke-opacity="0.06" stroke-width="1"/>
+              </pattern>
+
+              <!-- Metallic Gradients -->
+              <linearGradient id="metalGrad" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0%" stop-color="#64748b"/>
+                <stop offset="35%" stop-color="#cbd5e1"/>
+                <stop offset="70%" stop-color="#94a3b8"/>
+                <stop offset="100%" stop-color="#475569"/>
+              </linearGradient>
+
+              <linearGradient id="copperGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#f59e0b"/>
+                <stop offset="50%" stop-color="#d97706"/>
+                <stop offset="100%" stop-color="#92400e"/>
+              </linearGradient>
+
+              <linearGradient id="northPoleGrad" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#ef4444"/>
+                <stop offset="100%" stop-color="#b91c1c"/>
+              </linearGradient>
+
+              <linearGradient id="southPoleGrad" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#3b82f6"/>
+                <stop offset="100%" stop-color="#1d4ed8"/>
+              </linearGradient>
+
+              <linearGradient id="scaleBodyGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#334155"/>
+                <stop offset="100%" stop-color="#1e293b"/>
+              </linearGradient>
+
+              <linearGradient id="panGrad" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0%" stop-color="#94a3b8"/>
+                <stop offset="50%" stop-color="#e2e8f0"/>
+                <stop offset="100%" stop-color="#64748b"/>
+              </linearGradient>
+
+              <!-- Vector Arrowhead Markers -->
+              <marker id="arrowForceCoil" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+                <path d="M 0 1 L 10 5 L 0 9 z" fill="#10b981"/>
+              </marker>
+              <marker id="arrowForceMagnet" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+                <path d="M 0 1 L 10 5 L 0 9 z" fill="#f97316"/>
+              </marker>
+              <marker id="arrowBField" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+                <path d="M 0 1.5 L 9 5 L 0 8.5 z" fill="#38bdf8"/>
+              </marker>
+              <marker id="arrowCurrent" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="5.5" markerHeight="5.5" orient="auto">
+                <path d="M 0 1 L 10 5 L 0 9 z" fill="#facc15"/>
+              </marker>
+
+              <!-- Glow filter for highlights -->
+              <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+                <feGaussianBlur stdDeviation="3" result="blur"/>
+                <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+              </filter>
+            </defs>
+
+            <!-- Background Grid & Lab Table -->
+            <rect width="840" height="500" fill="url(#labGrid)" class="text-slate-900 dark:text-slate-100"/>
+            <!-- Table Surface -->
+            <rect x="0" y="445" width="840" height="55" fill="#1e293b" fill-opacity="0.18"/>
+            <line x1="0" y1="445" x2="840" y2="445" stroke="#64748b" stroke-opacity="0.4" stroke-width="2"/>
+
+            <!-- ==================== RETORT STAND (GIÁ ĐỠ) ==================== -->
+            <g id="retort-stand">
+              <!-- Stand Base -->
+              <path d="M 45 445 L 185 445 L 195 458 L 35 458 Z" fill="#334155" stroke="#475569" stroke-width="1.5"/>
+              <rect x="35" y="458" width="160" height="8" rx="2" fill="#1e293b"/>
+              <!-- Vertical Rod -->
+              <rect x="78" y="42" width="12" height="404" rx="4" fill="url(#metalGrad)" stroke="#475569" stroke-width="1"/>
+              <!-- Top Cap -->
+              <circle cx="84" cy="42" r="7" fill="#475569"/>
+            </g>
+
+            <!-- ==================== ELECTRONIC BALANCE (CÂN ĐIỆN TỬ) ==================== -->
+            <g id="electronic-balance">
+              <!-- Balance Feet -->
+              <rect x="195" y="444" width="18" height="7" rx="2" fill="#0f172a"/>
+              <rect x="387" y="444" width="18" height="7" rx="2" fill="#0f172a"/>
+              <!-- Balance Main Chassis (2.5D Trapezoid) -->
+              <path d="M 195 362 L 405 362 L 422 444 L 178 444 Z" fill="url(#scaleBodyGrad)" stroke="#475569" stroke-width="2"/>
+              <!-- Top Rim -->
+              <rect x="195" y="356" width="210" height="10" rx="4" fill="#475569"/>
+
+              <!-- Weighing Pan Assembly (moves subtly with force!) -->
+              <g id="scale-pan-group" style="transition: transform 0.08s linear;">
+                <!-- Pan Stem -->
+                <rect x="288" y="346" width="24" height="12" fill="#64748b"/>
+                <!-- Stainless Steel Pan -->
+                <rect x="210" y="338" width="180" height="10" rx="5" fill="url(#panGrad)" stroke="#64748b" stroke-width="1"/>
+
+                <!-- ==================== U-SHAPED MAGNET (2.5D PERSPECTIVE) ==================== -->
+                <!-- Back Pole: South (Blue) - behind the coil -->
+                <g id="magnet-back">
+                  <!-- Magnet Base on Pan -->
+                  <path d="M 238 338 L 362 338 L 372 316 L 248 316 Z" fill="#475569" stroke="#334155" stroke-width="1.5"/>
+                  <!-- Back South Arm (Blue) -->
+                  <path d="M 250 316 L 370 316 L 370 218 L 250 218 Z" fill="url(#southPoleGrad)" stroke="#1e3a8a" stroke-width="1.5" opacity="0.92"/>
+                  <!-- South Pole Top Edge -->
+                  <path d="M 250 218 L 262 208 L 382 208 L 370 218 Z" fill="#60a5fa" stroke="#1e40af" stroke-width="1"/>
+                  <!-- South Pole Side Depth -->
+                  <path d="M 370 218 L 382 208 L 382 306 L 370 316 Z" fill="#1e40af" stroke="#1e3a8a" stroke-width="1"/>
+                  <!-- Label S -->
+                  <text x="348" y="246" fill="#ffffff" font-size="22" font-weight="800" opacity="0.95">S</text>
+                  <text x="336" y="261" fill="#dbeafe" font-size="9.5" font-weight="600">(Cực Nam)</text>
+                </g>
+              </g>
+
+              <!-- LCD Screen Frame -->
+              <rect x="206" y="380" width="136" height="48" rx="6" fill="#061412" stroke="#0f766e" stroke-width="1.8"/>
+              <!-- LCD Indicators -->
+              <text id="lcd-tare-badge" x="214" y="393" fill="#34d399" font-size="8.5" font-weight="700" opacity="0.2">TARE</text>
+              <text x="246" y="393" fill="#6ee7b7" font-size="8.5" font-weight="600" opacity="0.7">MAX 1000g d=0.01g</text>
+              <!-- LCD Numeric Display -->
+              <text id="lcd-mass" x="334" y="419" text-anchor="end" fill="#34d399" font-size="22" font-weight="800" class="lcd-text">450.00 g</text>
+
+              <!-- Interactive TARE Button on Balance -->
+              <g id="svg-tare-btn" class="cursor-pointer">
+                <rect id="tare-highlight-ring" x="350" y="380" width="52" height="48" rx="8" fill="none" stroke="#facc15" stroke-width="3" class="svg-pulse hidden"/>
+                <rect x="353" y="383" width="46" height="42" rx="7" fill="#0ea5e9" stroke="#38bdf8" stroke-width="1.5"/>
+                <text x="376" y="402" text-anchor="middle" fill="#ffffff" font-size="10.5" font-weight="800">TARE</text>
+                <text x="376" y="416" text-anchor="middle" fill="#e0f2fe" font-size="9" font-weight="700">0.00</text>
+              </g>
+            </g>
+
+            <!-- ==================== MAGNETIC FIELD LINES B (N -> S, INTO PLANE) ==================== -->
+            <g id="b-field-layer">
+              <!-- Symbols showing B pointing from front N pole into back S pole (⊗) -->
+              <g opacity="0.88">
+                <circle cx="268" cy="264" r="7" fill="none" stroke="#38bdf8" stroke-width="1.5"/>
+                <path d="M 264 260 L 272 268 M 272 260 L 264 268" stroke="#38bdf8" stroke-width="1.5"/>
+
+                <circle cx="300" cy="264" r="7" fill="none" stroke="#38bdf8" stroke-width="1.5"/>
+                <path d="M 296 260 L 304 268 M 304 260 L 296 268" stroke="#38bdf8" stroke-width="1.5"/>
+
+                <circle cx="332" cy="264" r="7" fill="none" stroke="#38bdf8" stroke-width="1.5"/>
+                <path d="M 328 260 L 336 268 M 336 260 L 328 268" stroke="#38bdf8" stroke-width="1.5"/>
+
+                <!-- Diagonal 2.5D Field Arrows from Front N to Back S -->
+                <line x1="256" y1="290" x2="275" y2="270" stroke="#38bdf8" stroke-width="1.8" stroke-dasharray="4 3" marker-end="url(#arrowBField)"/>
+                <line x1="288" y1="290" x2="307" y2="270" stroke="#38bdf8" stroke-width="1.8" stroke-dasharray="4 3" marker-end="url(#arrowBField)"/>
+                <line x1="320" y1="290" x2="339" y2="270" stroke="#38bdf8" stroke-width="1.8" stroke-dasharray="4 3" marker-end="url(#arrowBField)"/>
+              </g>
+              <!-- B Field Badge -->
+              <g transform="translate(384, 232)">
+                <rect x="0" y="0" width="90" height="24" rx="6" fill="#0284c7" fill-opacity="0.2" stroke="#38bdf8" stroke-width="1"/>
+                <text x="45" y="16" text-anchor="middle" fill="#38bdf8" font-size="11" font-weight="700">B⃗ (N → S ⊗)</text>
+              </g>
+            </g>
+
+            <!-- ==================== MOVABLE COIL ASSEMBLY (KHUNG DÂY N VÒNG) ==================== -->
+            <g id="coil-assembly" style="transition: transform 0.65s cubic-bezier(0.34, 1.4, 0.64, 1);">
+              <!-- Clamp on Stand -->
+              <rect x="70" y="88" width="28" height="22" rx="4" fill="#475569" stroke="#94a3b8" stroke-width="1.2"/>
+              <circle cx="66" cy="99" r="5" fill="#f59e0b"/>
+              <!-- Horizontal Support Arm -->
+              <rect x="98" y="95" width="212" height="8" rx="3" fill="url(#metalGrad)" stroke="#475569" stroke-width="1"/>
+              <!-- Insulating Holder Block -->
+              <rect x="284" y="88" width="32" height="24" rx="5" fill="#1e293b" stroke="#64748b" stroke-width="1.5"/>
+              <!-- Rotation Axis Indicator -->
+              <line x1="300" y1="112" x2="300" y2="145" stroke="#94a3b8" stroke-width="3"/>
+
+              <!-- Coil Frame (width scales with sin(alpha) around x=300) -->
+              <g id="coil-rotatable" transform="translate(300, 0)">
+                <!-- Outer & Inner Copper Turns Representation -->
+                <rect id="coil-rect-outer" x="-52" y="145" width="104" height="132" rx="6" fill="none" stroke="url(#copperGrad)" stroke-width="7"/>
+                <rect id="coil-rect-inner" x="-48" y="149" width="96" height="124" rx="4" fill="none" stroke="#fbbf24" stroke-width="1.5" stroke-opacity="0.7"/>
+
+                <!-- Animated Current Overlay along Coil -->
+                <path id="coil-current-path" d="M -52 145 L -52 277 L 52 277 L 52 145" fill="none" stroke="#fef08a" stroke-width="3.5" stroke-linecap="round" opacity="0"/>
+
+                <!-- Current Direction Arrow on Bottom Wire -->
+                <g id="coil-i-arrow" opacity="0">
+                  <line id="coil-i-line" x1="-22" y1="277" x2="22" y2="277" stroke="#facc15" stroke-width="3" marker-end="url(#arrowCurrent)"/>
+                  <rect x="-14" y="283" width="28" height="16" rx="4" fill="#0f172a" fill-opacity="0.85"/>
+                  <text id="coil-i-label" x="0" y="295" text-anchor="middle" fill="#facc15" font-size="11" font-weight="800">+I</text>
+                </g>
+
+                <!-- Dimension Label l & N -->
+                <text id="svg-coil-meta" x="0" y="137" text-anchor="middle" fill="#fbbf24" font-size="11" font-weight="700">N = 100 vòng | l = 5.0 cm</text>
+              </g>
+
+              <!-- Angle Alpha Mini Indicator -->
+              <g id="angle-badge" transform="translate(154, 118)">
+                <rect x="0" y="0" width="82" height="24" rx="6" fill="#0f172a" fill-opacity="0.75" stroke="#64748b" stroke-width="1"/>
+                <text id="svg-alpha-text" x="41" y="16" text-anchor="middle" fill="#e2e8f0" font-size="11" font-weight="700">α = 90°</text>
+              </g>
+            </g>
+
+            <!-- ==================== FRONT POLE OF U-MAGNET (NORTH - RED, SEMI-TRANSPARENT CUTAWAY) ==================== -->
+            <g id="magnet-front-group" style="transition: transform 0.08s linear;">
+              <!-- Front North Arm (Red, slight transparency so bottom coil wire & vectors stay crystal clear) -->
+              <path d="M 232 336 L 352 336 L 352 278 L 232 278 Z" fill="url(#northPoleGrad)" stroke="#991b1b" stroke-width="1.5" fill-opacity="0.78"/>
+              <path d="M 232 278 L 242 270 L 362 270 L 352 278 Z" fill="#f87171" fill-opacity="0.75" stroke="#b91c1c" stroke-width="1"/>
+              <!-- Label N -->
+              <text x="244" y="316" fill="#ffffff" font-size="22" font-weight="800">N</text>
+              <text x="242" y="329" fill="#fee2e2" font-size="9.5" font-weight="600">(Cực Bắc)</text>
+            </g>
+
+            <!-- ==================== NEWTON'S 3RD LAW FORCE VECTORS ==================== -->
+            <g id="force-vectors-layer" opacity="0">
+              <!-- Vector 1: Magnetic Force on Bottom Wire of Coil (F_từ - Emerald) -->
+              <line id="vec-f-coil" x1="300" y1="277" x2="300" y2="215" stroke="#10b981" stroke-width="4.5" stroke-linecap="round" marker-end="url(#arrowForceCoil)" filter="url(#glow)"/>
+              <g id="lbl-f-coil-group" transform="translate(310, 212)">
+                <rect x="0" y="-12" width="118" height="22" rx="6" fill="#064e3b" fill-opacity="0.9" stroke="#10b981" stroke-width="1.2"/>
+                <text id="lbl-f-coil" x="59" y="3" text-anchor="middle" fill="#6ee7b7" font-size="11" font-weight="800">F⃗ từ = 0.225 N</text>
+              </g>
+
+              <!-- Vector 2: Reaction Force on Magnet / Scale (F'_nén - Bright Orange) -->
+              <line id="vec-f-magnet" x1="300" y1="304" x2="300" y2="366" stroke="#f97316" stroke-width="4.5" stroke-linecap="round" marker-end="url(#arrowForceMagnet)" filter="url(#glow)"/>
+              <g id="lbl-f-magnet-group" transform="translate(152, 344)">
+                <rect x="0" y="-12" width="136" height="22" rx="6" fill="#7c2d12" fill-opacity="0.92" stroke="#f97316" stroke-width="1.2"/>
+                <text id="lbl-f-magnet" x="68" y="3" text-anchor="middle" fill="#fed7aa" font-size="11" font-weight="800">F⃗' nén = 0.225 N</text>
+              </g>
+            </g>
+
+            <!-- ==================== LEFT-HAND RULE OVERLAY (QUY TẮC BÀN TAY TRÁI) ==================== -->
+            <g id="left-hand-overlay" class="hidden" opacity="0.95">
+              <!-- Semi-transparent halo card behind hand -->
+              <rect x="200" y="155" width="200" height="165" rx="16" fill="#0f172a" fill-opacity="0.62" stroke="#a855f7" stroke-width="1.5" stroke-dasharray="5 3"/>
+              <!-- Flippable Hand Group centered at (300, 240) -->
+              <g id="left-hand-graphic" transform="translate(300, 244)">
+                <!-- Stylized Left Hand (Palm facing viewer, fingers pointing RIGHT for +I, thumb pointing UP for +F) -->
+                <g fill="#f5d0fe" fill-opacity="0.88" stroke="#7e22ce" stroke-width="2" stroke-linejoin="round">
+                  <!-- Wrist & Palm -->
+                  <path d="M -68 -14 L -32 -14 C -25 -14 -20 -26 -14 -44 C -11 -54 -2 -55 1 -46 C 3 -36 -2 -22 -4 -14 L 46 -14 C 53 -14 55 -6 48 -4 L 18 -4 L 54 -3 C 61 -3 62 5 55 7 L 18 7 L 50 8 C 57 8 58 16 51 18 L 15 18 L 38 19 C 44 19 45 27 38 28 L -18 28 C -30 28 -38 22 -44 16 L -68 16 Z"/>
+                </g>
+                <!-- Palm B-field cross symbol (B piercing into palm) -->
+                <circle cx="-12" cy="7" r="9" fill="#0284c7" fill-opacity="0.25" stroke="#0284c7" stroke-width="2"/>
+                <path d="M -16 3 L -8 11 M -8 3 L -16 11" stroke="#0284c7" stroke-width="2"/>
+                <!-- Thumb Vector Arrow (F_từ) -->
+                <line x1="-8" y1="-48" x2="-8" y2="-74" stroke="#10b981" stroke-width="3.5" marker-end="url(#arrowForceCoil)"/>
+                <!-- Fingers Vector Arrow (I) -->
+                <line x1="20" y1="2" x2="72" y2="2" stroke="#facc15" stroke-width="3.5" marker-end="url(#arrowCurrent)"/>
+              </g>
+              <!-- Explanatory Legend inside overlay -->
+              <text x="300" y="172" text-anchor="middle" fill="#e9d5ff" font-size="11" font-weight="800">QUY TẮC BÀN TAY TRÁI</text>
+              <text id="lhr-caption" x="300" y="311" text-anchor="middle" fill="#cbd5e1" font-size="10" font-weight="600">B⃗ vào lòng bàn tay • Ngón tay: I • Ngón cái: F⃗ từ</text>
+            </g>
+
+            <!-- ==================== ELECTRICAL CIRCUIT (MẠCH ĐIỆN DC) ==================== -->
+            <g id="electrical-circuit">
+              <!-- Connecting Wires from Coil to Circuit -->
+              <!-- Wire A (Left side of coil -> Switch K -> Power Supply +) -->
+              <path id="wire-main-1" d="M 272 100 L 460 100 L 460 132 L 520 132" fill="none" stroke="#ef4444" stroke-width="3" stroke-linejoin="round"/>
+              <!-- Wire B (Power Supply - -> Reversing Switch -> Rheostat -> Ammeter -> Right side of coil) -->
+              <path id="wire-main-2" d="M 620 132 L 770 132 L 770 218 L 735 218" fill="none" stroke="#3b82f6" stroke-width="3" stroke-linejoin="round"/>
+              <path id="wire-main-3" d="M 650 218 L 570 218 L 570 288" fill="none" stroke="#3b82f6" stroke-width="3" stroke-linejoin="round"/>
+              <path id="wire-main-4" d="M 730 330 L 770 330 L 770 400 L 665 400" fill="none" stroke="#38bdf8" stroke-width="3" stroke-linejoin="round"/>
+              <path id="wire-main-5" d="M 555 400 L 475 400 L 475 112 L 316 112" fill="none" stroke="#38bdf8" stroke-width="3" stroke-linejoin="round"/>
+
+              <!-- Animated Current Particles along circuit -->
+              <path id="circuit-flow-overlay" d="M 316 112 L 475 112 L 475 400 L 770 400 L 770 132 L 460 132 L 460 100 L 272 100" fill="none" stroke="#fde047" stroke-width="3" stroke-linecap="round" opacity="0"/>
+
+              <!-- 1. DC POWER SUPPLY (NGUỒN ĐIỆN DC) -->
+              <g transform="translate(520, 88)">
+                <rect x="0" y="0" width="110" height="72" rx="10" fill="#1e293b" stroke="#475569" stroke-width="2"/>
+                <text x="55" y="19" text-anchor="middle" fill="#94a3b8" font-size="10" font-weight="700">NGUỒN DC 12V</text>
+                <!-- + and - terminals -->
+                <circle cx="24" cy="46" r="9" fill="#ef4444" stroke="#fca5a5" stroke-width="1.5"/>
+                <text x="24" y="50" text-anchor="middle" fill="#ffffff" font-size="13" font-weight="800">+</text>
+                <circle cx="86" cy="46" r="9" fill="#3b82f6" stroke="#93c5fd" stroke-width="1.5"/>
+                <text x="86" y="50" text-anchor="middle" fill="#ffffff" font-size="14" font-weight="800">−</text>
+                <!-- Power LED -->
+                <circle id="psu-led" cx="55" cy="46" r="4.5" fill="#22c55e"/>
+              </g>
+
+              <!-- 2. INTERACTIVE SWITCH K (KHÓA K) -->
+              <g id="svg-switch-k" transform="translate(650, 188)" class="cursor-pointer">
+                <rect id="switch-k-pulse" x="-6" y="-6" width="98" height="62" rx="12" fill="none" stroke="#facc15" stroke-width="2.5" class="svg-pulse hidden"/>
+                <rect x="0" y="0" width="86" height="50" rx="9" fill="#1e293b" stroke="#64748b" stroke-width="1.8"/>
+                <text x="43" y="15" text-anchor="middle" fill="#cbd5e1" font-size="10" font-weight="700">KHÓA K</text>
+                <circle cx="18" cy="34" r="4.5" fill="#94a3b8"/>
+                <circle cx="68" cy="34" r="4.5" fill="#94a3b8"/>
+                <!-- Knife blade rotates when closed -->
+                <line id="switch-k-blade" x1="18" y1="34" x2="64" y2="18" stroke="#facc15" stroke-width="3.5" stroke-linecap="round" style="transition: all 0.2s ease;"/>
+                <text id="switch-k-state-txt" x="43" y="46" text-anchor="middle" fill="#f87171" font-size="8.5" font-weight="800">MỞ</text>
+              </g>
+
+              <!-- 3. INTERACTIVE REVERSING SWITCH (ĐẢO CHIỀU ±I) -->
+              <g id="svg-reverse-btn" transform="translate(505, 188)" class="cursor-pointer">
+                <rect x="0" y="0" width="110" height="50" rx="9" fill="#1e293b" stroke="#64748b" stroke-width="1.8"/>
+                <text x="55" y="16" text-anchor="middle" fill="#cbd5e1" font-size="9.5" font-weight="700">ĐẢO CHIỀU I</text>
+                <rect id="rev-pill" x="14" y="23" width="82" height="20" rx="6" fill="#0284c7" fill-opacity="0.25" stroke="#38bdf8" stroke-width="1"/>
+                <text id="rev-svg-txt" x="55" y="37" text-anchor="middle" fill="#38bdf8" font-size="10.5" font-weight="800">Thuận (+I)</text>
+              </g>
+
+              <!-- 4. SLIDING RHEOSTAT (BIẾN TRỞ CON CHẠY) -->
+              <g transform="translate(530, 275)">
+                <rect x="0" y="0" width="205" height="72" rx="10" fill="#1e293b" stroke="#475569" stroke-width="1.8"/>
+                <text x="102" y="16" text-anchor="middle" fill="#94a3b8" font-size="10" font-weight="700">BIẾN TRỞ CON CHẠY (R)</text>
+                <!-- Coil body -->
+                <rect x="20" y="34" width="165" height="22" rx="4" fill="#334155" stroke="#64748b" stroke-width="1.2"/>
+                <!-- Resistor windings -->
+                <path d="M 28 34 L 28 56 M 38 34 L 38 56 M 48 34 L 48 56 M 58 34 L 58 56 M 68 34 L 68 56 M 78 34 L 78 56 M 88 34 L 88 56 M 98 34 L 98 56 M 108 34 L 108 56 M 118 34 L 118 56 M 128 34 L 128 56 M 138 34 L 138 56 M 148 34 L 148 56 M 158 34 L 158 56 M 168 34 L 168 56 M 178 34 L 178 56" stroke="#94a3b8" stroke-width="1.5" stroke-opacity="0.6"/>
+                <!-- Top Slider Bar -->
+                <line x1="18" y1="26" x2="188" y2="26" stroke="#cbd5e1" stroke-width="3" stroke-linecap="round"/>
+                <!-- Movable Wiper (x translates from 25 to 175) -->
+                <g id="rheostat-wiper" transform="translate(100, 0)" style="transition: transform 0.15s ease-out;">
+                  <rect x="-10" y="20" width="20" height="14" rx="3" fill="#0ea5e9" stroke="#e0f2fe" stroke-width="1.2"/>
+                  <polygon points="-4,34 4,34 0,41" fill="#38bdf8"/>
+                </g>
+              </g>
+
+              <!-- 5. DIGITAL AMMETER (AMPE KẾ) -->
+              <g transform="translate(555, 368)">
+                <rect x="0" y="0" width="110" height="62" rx="10" fill="#1e293b" stroke="#0284c7" stroke-width="2"/>
+                <text x="55" y="16" text-anchor="middle" fill="#38bdf8" font-size="10" font-weight="800">AMPE KẾ (A)</text>
+                <rect x="10" y="22" width="90" height="30" rx="5" fill="#081226" stroke="#0369a1" stroke-width="1.2"/>
+                <text id="svg-ammeter-val" x="92" y="43" text-anchor="end" fill="#38bdf8" font-size="17" font-weight="800" class="lcd-text">0.00 A</text>
+              </g>
+            </g>
+          </svg>
+        </div>
+
+        <!-- ==================== LIVE FORMULA DECODING PIPELINE ==================== -->
+        <div class="p-3 sm:p-3.5 border-t border-white/35 bg-white/10">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-[11px] font-extrabold uppercase tracking-wider">
+              Luồng giải mã bản chất vật lí (Thời gian thực)
+            </span>
+            <span id="pipeline-status" class="text-[11px] font-bold px-3 py-0.5 rounded-full bg-white/25 border border-white/45">
+              Mạch đang mở
+            </span>
+          </div>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center">
+            <!-- Step A: Force Action -->
+            <div class="sky-subcard p-2.5">
+              <div class="text-[10px] font-bold">1. Phản lực lên nam châm</div>
+              <div id="pipe-action" class="text-xs sm:text-sm font-extrabold mt-0.5">Không có lực</div>
+            </div>
+            <!-- Step B: Delta m -->
+            <div class="sky-subcard p-2.5">
+              <div class="text-[10px] font-bold">2. Độ lệch cân Δm</div>
+              <div id="pipe-dm" class="text-xs sm:text-sm font-mono font-extrabold mt-0.5">0.00 g</div>
+            </div>
+            <!-- Step C: Force F -->
+            <div class="sky-subcard p-2.5">
+              <div class="text-[10px] font-bold">3. Lực từ F = |Δm|·g</div>
+              <div id="pipe-f" class="text-xs sm:text-sm font-mono font-extrabold mt-0.5">0.0000 N</div>
+            </div>
+            <!-- Step D: B -->
+            <div class="sky-subcard p-2.5 bg-sky-600/40">
+              <div class="text-[10px] font-bold">4. B = F / (I·N·l·sinα)</div>
+              <div id="pipe-b" class="text-xs sm:text-sm font-mono font-black mt-0.5">— T</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==================== QUIZ / SELF-CHECK BOX (VISIBLE WHEN B_TRUE IS HIDDEN) ==================== -->
+      <div id="quiz-panel" class="hidden sky-card p-4">
+        <div class="flex flex-wrap items-center justify-between gap-2 mb-2.5">
+          <div class="flex items-center gap-2">
+            <span class="text-lg">🎯</span>
+            <div>
+              <h3 class="text-sm font-extrabold">Chế độ Kiểm tra / Thuyết trình (Ẩn B thật)</h3>
+              <p class="text-xs font-semibold">Hãy tự tính cảm ứng từ B từ số đo trên cân (Δm) và Ampe kế (I), sau đó nhập đáp án:</p>
+            </div>
+          </div>
+          <button id="btn-randomize-b" class="sky-pill-btn px-3 py-1.5 text-xs font-bold bg-amber-400/45 hover:bg-amber-400/65 border border-white/50 transition">
+            🎲 Đổi nam châm mới
+          </button>
+        </div>
+        <div class="flex flex-wrap items-center gap-2">
+          <div class="relative flex-1 min-w-[180px]">
+            <input id="quiz-input-b" type="number" step="0.001" placeholder="Nhập giá trị B (ví dụ: 0.045)" class="w-full px-4 py-2 pr-10 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-white/70"/>
+            <span class="absolute right-4 top-2 text-xs font-bold">T</span>
+          </div>
+          <button id="btn-check-quiz" class="sky-pill-btn px-5 py-2 bg-amber-500/80 hover:bg-amber-500 border border-white/50 text-xs sm:text-sm font-extrabold shadow-sm transition">
+            Kiểm tra đáp án
+          </button>
+        </div>
+        <div id="quiz-feedback" class="hidden mt-2.5 text-xs sm:text-sm font-bold rounded-full px-4 py-2"></div>
+      </div>
+
+    </section>
+
+    <!-- ==================== 3. RIGHT PANEL (40% -> 5/12 cols) ==================== -->
+    <aside class="lg:col-span-5 flex flex-col gap-4">
+
+      <!-- CONTROL PANEL CARD -->
+      <div class="sky-card p-4">
+        <div class="flex items-center justify-between mb-3">
+          <h2 class="text-sm font-extrabold uppercase tracking-wide flex items-center gap-2">
+            <span>⚙️</span> Bảng Điều Khiển Thiết Bị
+          </h2>
+          <button id="btn-reset-all" class="sky-pill-btn px-3 py-1 text-xs font-bold bg-white/15 hover:bg-rose-500/45 border border-white/40 transition">
+            ↺ Đặt lại mặc định
+          </button>
+        </div>
+
+        <!-- Primary Switches Row -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 mb-4">
+          <!-- Switch K Button -->
+          <button id="btn-switch-k" class="p-3 rounded-3xl border-2 border-white/55 bg-rose-500/40 hover:bg-rose-500/55 text-left transition flex items-center justify-between">
+            <div>
+              <div class="text-[11px] font-bold">Công tắc mạch điện</div>
+              <div id="ctrl-k-text" class="text-sm font-extrabold">Khóa K: MỞ (0 A)</div>
+            </div>
+            <span id="ctrl-k-dot" class="w-4 h-4 rounded-full bg-rose-400 border-2 border-white shadow-sm"></span>
+          </button>
+
+          <!-- Current Direction Button -->
+          <button id="btn-reverse-i" class="p-3 rounded-3xl border-2 border-white/55 bg-sky-600/45 hover:bg-sky-600/65 text-left transition flex items-center justify-between">
+            <div>
+              <div class="text-[11px] font-bold">Chiều dòng điện</div>
+              <div id="ctrl-dir-text" class="text-sm font-extrabold">Thuận (+I: Cân tăng)</div>
+            </div>
+            <span class="text-base font-extrabold">⇄</span>
+          </button>
+        </div>
+
+        <!-- Rheostat Slider (Current I) -->
+        <div class="sky-subcard p-3.5 mb-3.5">
+          <div class="flex items-center justify-between mb-1.5">
+            <label for="slider-i" class="text-xs font-extrabold">
+              Biến trở — Cường độ dòng điện (I)
+            </label>
+            <span id="val-i" class="font-mono text-sm font-black">1.00 A</span>
+          </div>
+          <input id="slider-i" type="range" min="0" max="2" step="0.05" value="1.00" class="w-full" />
+          <div class="flex justify-between text-[10px] font-mono font-bold mt-1">
+            <span>0.00 A</span>
+            <span>0.50 A</span>
+            <span>1.00 A</span>
+            <span>1.50 A</span>
+            <span>2.00 A</span>
+          </div>
+        </div>
+
+        <!-- Advanced Coil & Environment Settings -->
+        <details class="sky-subcard group" open>
+          <summary class="cursor-pointer px-3.5 py-2.5 text-xs font-extrabold flex items-center justify-between select-none">
+            <span>🔬 Thông số khung dây &amp; môi trường (N, l, α, g)</span>
+            <span class="transition-transform group-open:rotate-180">▾</span>
+          </summary>
+          <div class="px-3.5 pb-3.5 pt-2 space-y-3 border-t border-white/30">
+            <!-- Number of turns N -->
+            <div>
+              <div class="flex justify-between text-xs mb-1">
+                <span class="font-bold">Số vòng dây (N)</span>
+                <span id="val-n" class="font-mono font-extrabold">100 vòng</span>
+              </div>
+              <input id="slider-n" type="range" min="50" max="200" step="10" value="100" class="w-full" />
+            </div>
+
+            <!-- Length l -->
+            <div>
+              <div class="flex justify-between text-xs mb-1">
+                <span class="font-bold">Chiều dài cạnh đáy (l)</span>
+                <span id="val-l" class="font-mono font-extrabold">5.0 cm</span>
+              </div>
+              <input id="slider-l" type="range" min="2.0" max="8.0" step="0.5" value="5.0" class="w-full" />
+            </div>
+
+            <!-- Angle alpha -->
+            <div>
+              <div class="flex justify-between text-xs mb-1">
+                <span class="font-bold">Góc giữa khung dây &amp; B⃗ (α)</span>
+                <span id="val-alpha" class="font-mono font-extrabold">90° (sinα = 1.00)</span>
+              </div>
+              <input id="slider-alpha" type="range" min="0" max="90" step="5" value="90" class="w-full" />
+            </div>
+
+            <!-- Gravity g -->
+            <div class="flex items-center justify-between pt-1">
+              <label for="input-g" class="text-xs font-bold">Gia tốc trọng trường (g)</label>
+              <div class="flex items-center gap-1.5">
+                <input id="input-g" type="number" step="0.01" min="9.7" max="10.0" value="9.80" class="w-20 px-2.5 py-1 text-xs font-mono font-bold text-right"/>
+                <span class="text-xs font-bold">m/s²</span>
+              </div>
+            </div>
+          </div>
+        </details>
+
+        <!-- Action Buttons Row: TARE + RECORD -->
+        <div class="grid grid-cols-2 gap-2.5 mt-3.5">
+          <button id="btn-tare-panel" class="sky-pill-btn py-2.5 px-3 font-extrabold text-xs sm:text-sm border border-white/55 bg-white/20 hover:bg-white/35 transition">
+            ⚖️ Trừ bì (TARE)
+          </button>
+          <button id="btn-record" class="sky-pill-btn py-2.5 px-3 font-extrabold text-xs sm:text-sm bg-emerald-500/80 hover:bg-emerald-500 border border-white/55 shadow-md transition">
+            📝 Ghi kết quả vào bảng
+          </button>
+        </div>
+      </div>
+
+      <!-- DATA TABLE & ERROR ANALYSIS CARD -->
+      <div id="data-card" class="sky-card p-4 flex flex-col gap-3.5">
+        <div class="flex items-center justify-between">
+          <h2 class="text-sm font-extrabold uppercase tracking-wide flex items-center gap-2">
+            <span>📊</span> Bảng Số Liệu &amp; Xử Lí Sai Số
+          </h2>
+          <button id="btn-clear-data" class="sky-pill-btn px-3 py-1 text-xs font-bold bg-rose-500/40 hover:bg-rose-500/60 border border-white/40 transition">
+            Xóa bảng
+          </button>
+        </div>
+
+        <!-- Recorded Measurements Table -->
+        <div class="overflow-x-auto rounded-3xl border border-white/40 bg-sky-900/20">
+          <table class="w-full text-xs text-left">
+            <thead class="bg-white/20 font-extrabold">
+              <tr>
+                <th class="px-2.5 py-2.5 text-center">Lần</th>
+                <th class="px-2.5 py-2.5 text-right">I (A)</th>
+                <th class="px-2.5 py-2.5 text-right">|Δm| (g)</th>
+                <th class="px-2.5 py-2.5 text-right">F (N)</th>
+                <th class="px-2.5 py-2.5 text-right">B (T)</th>
+                <th class="px-2 py-2.5 text-center"></th>
+              </tr>
+            </thead>
+            <tbody id="data-table-body" class="divide-y divide-white/25 font-mono">
+              <tr id="empty-row">
+                <td colspan="6" class="px-3 py-5 text-center font-sans italic">
+                  Chưa có số liệu. Hãy đóng khóa K, điều chỉnh I và bấm "Ghi kết quả vào bảng".
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Statistical Summary Box -->
+        <div class="grid grid-cols-3 gap-2 text-center">
+          <div class="sky-subcard p-2.5">
+            <div class="text-[10px] font-bold">Trung bình B̄</div>
+            <div id="stat-b-mean" class="text-xs sm:text-sm font-mono font-black mt-0.5">—</div>
+          </div>
+          <div class="sky-subcard p-2.5">
+            <div class="text-[10px] font-bold">Sai số ΔB̄</div>
+            <div id="stat-b-err" class="text-xs sm:text-sm font-mono font-black mt-0.5">—</div>
+          </div>
+          <div class="sky-subcard p-2.5">
+            <div class="text-[10px] font-bold">Sai số tỉ đối</div>
+            <div id="stat-b-rel" class="text-xs sm:text-sm font-mono font-black mt-0.5">—</div>
+          </div>
+        </div>
+
+        <!-- Final Formatted Result -->
+        <div id="final-result-box" class="hidden rounded-full px-4 py-2 bg-sky-600/55 border border-white/55 text-center text-xs sm:text-sm font-mono font-extrabold">
+          B = 0.0450 ± 0.0002 (T)
+        </div>
+
+        <!-- Linear Graph F(I) -->
+        <div class="sky-subcard p-3">
+          <div class="flex items-center justify-between mb-1.5">
+            <span class="text-xs font-extrabold">Đồ thị tuyến tính F theo I</span>
+            <span id="graph-slope-lbl" class="text-[11px] font-mono font-bold">Hệ số góc k = —</span>
+          </div>
+          <div class="rounded-2xl bg-slate-900/60 p-1.5 border border-white/30">
+            <svg id="fi-graph" viewBox="0 0 380 190" class="w-full h-auto block">
+              <!-- Populated by renderGraph() -->
+            </svg>
+          </div>
+        </div>
+      </div>
+
+    </aside>
+  </main>
+
+  <!-- ==================== BOTTOM CONTINUOUS DISSOLVING MEMBER TICKER ==================== -->
+  <footer id="member-dissolve-footer" class="member-ticker-bar sticky bottom-0 z-30 w-full">
+    <div class="max-w-[1600px] mx-auto px-3 sm:px-5 flex items-center gap-3">
+      <span class="shrink-0 px-3 py-1 rounded-full bg-white/25 border border-white/50 text-[11px] sm:text-xs font-extrabold whitespace-nowrap">
+        ✨ Tổ 2
+      </span>
+      <div id="member-ticker-stage" class="ticker-stage flex-1">
+        <!-- Populated & animated continuously by startMemberTicker() -->
+      </div>
+    </div>
+  </footer>
+
+  </div> <!-- End #main-lab-wrapper -->
+
+  <!-- ==================== SCREEN 4: THANK YOU ENDING PAGE (TRANG XIN CẢM ƠN ĐÃ LẮNG NGHE) ==================== -->
+  <section id="thankyou-overlay" aria-label="Trang xin cảm ơn đã lắng nghe" class="thankyou-overlay slide-page page-right flex flex-col items-center justify-between px-4 sm:px-8 py-6 sm:py-10 pb-24 text-slate-900 select-none">
+    <!-- Subtle Decorative Arcs matching Intro Screen -->
+    <svg class="pointer-events-none fixed inset-0 w-full h-full opacity-[0.045]" preserveAspectRatio="none" viewBox="0 0 1440 900" fill="none">
+      <path d="M-60 220 C 360 390, 820 110, 1500 320" stroke="#0c213d" stroke-width="2" stroke-dasharray="10 10"/>
+      <path d="M-60 660 C 400 480, 960 760, 1500 540" stroke="#0284c7" stroke-width="2" stroke-dasharray="10 10"/>
+      <circle cx="240" cy="210" r="165" stroke="#0284c7" stroke-width="1.5"/>
+      <circle cx="1220" cy="690" r="185" stroke="#0c213d" stroke-width="1.5"/>
+    </svg>
+
+    <!-- Top Bar -->
+    <div class="relative z-10 w-full max-w-5xl flex items-center justify-between">
+      <span class="thankyou-ltr inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/90 border border-slate-200/90 shadow-sm text-xs font-bold text-slate-600" style="animation-delay: 0.08s;">
+        <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+        Hoàn thành bài thực hành • Vật Lí 12 (KNTT)
+      </span>
+      <button id="btn-replay-thankyou" type="button" title="Phát lại hiệu ứng hiện chữ từ trái qua" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/90 hover:bg-white border border-slate-200/90 shadow-sm text-xs font-bold text-slate-600 hover:text-sky-700 transition cursor-pointer">
+        <span>↻</span>
+        <span class="hidden sm:inline">Phát lại hiệu ứng</span>
+      </button>
+    </div>
+
+    <!-- Center Left-to-Right Revealing Rounded Thank You Content -->
+    <div class="relative z-10 w-full max-w-4xl my-auto py-8 flex flex-col items-center text-center">
+      <!-- Soft Rounded Decorative Icon -->
+      <div class="thankyou-ltr mb-4 w-16 h-16 rounded-full bg-white border border-slate-200/90 shadow-md flex items-center justify-center text-3xl" style="animation-delay: 0.14s;">
+        ✨
+      </div>
+
+      <!-- Main Heading matching "xin chào / tổ hai" style, smoothly revealed left-to-right -->
+      <h2 class="thankyou-ltr thankyou-script text-5xl sm:text-7xl md:text-8xl leading-[1.22] px-2" style="animation-delay: 0.24s;">
+        xin cảm ơn
+      </h2>
+      <p class="thankyou-ltr thankyou-rounded-sub text-3xl sm:text-5xl md:text-6xl leading-[1.28] mt-2 sm:mt-3 px-2" style="animation-delay: 0.62s;">
+        đã lắng nghe
+      </p>
+
+      <!-- Rounded Soft Divider -->
+      <div class="thankyou-ltr mt-6 sm:mt-7 flex items-center justify-center gap-3 text-xs sm:text-sm font-bold text-slate-500 uppercase tracking-wider" style="animation-delay: 0.96s;">
+        <span class="w-10 h-1 rounded-full bg-sky-200"></span>
+        <span>Tổ 2 • Lớp 12</span>
+        <span class="w-10 h-1 rounded-full bg-sky-200"></span>
+      </div>
+
+      <!-- Warm Closing Note -->
+      <p class="thankyou-ltr font-rounded mt-4 max-w-xl text-sm sm:text-base font-semibold text-slate-600 leading-relaxed px-3" style="animation-delay: 1.14s;">
+        Cảm ơn thầy cô và các bạn đã theo dõi phần thuyết trình và thí nghiệm mô phỏng
+        <span class="text-[#0c213d] font-bold">Đo độ lớn cảm ứng từ</span> của Tổ 2!
+      </p>
+
+      <!-- Rounded White Action Buttons -->
+      <div class="thankyou-ltr mt-8 sm:mt-10 flex flex-wrap items-center justify-center gap-3.5" style="animation-delay: 1.36s;">
+        <button id="btn-thankyou-back-lab" type="button" class="btn-start-white inline-flex items-center gap-2.5 px-7 py-3 rounded-full text-sm font-extrabold cursor-pointer">
+          <span>←</span>
+          <span>Trở về thí nghiệm</span>
+        </button>
+        <button id="btn-thankyou-restart" type="button" class="btn-start-white inline-flex items-center gap-2.5 px-7 py-3 rounded-full text-sm font-extrabold cursor-pointer">
+          <span>🏠</span>
+          <span>Về trang mở đầu</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Bottom Spacer -->
+    <div class="relative z-10 h-2"></div>
+  </section>
+
+  <!-- ==================== UNIFIED DIRECTIONAL PAGE NAVIGATION DOCK ==================== -->
+  <nav id="page-nav-dock" aria-label="Điều hướng giữa các trang" class="page-nav-dock dock-light">
+    <button id="btn-nav-prev" type="button" class="dock-btn" title="Trở về trang trước (Phím mũi tên trái)">
+      <span>←</span>
+      <span class="hidden sm:inline">Trở về trước</span>
+      <span class="sm:hidden">Trước</span>
+    </button>
+
+    <div class="flex items-center gap-1.5 px-2">
+      <button type="button" class="dock-dot is-active" data-page-target="0" title="Trang 1: Xin chào (Tổ 2)"></button>
+      <button type="button" class="dock-dot" data-page-target="1" title="Trang 2: Hiệu ứng ngôi sao Tổ 2"></button>
+      <button type="button" class="dock-dot" data-page-target="2" title="Trang 3: Phòng thí nghiệm thực hành"></button>
+      <button type="button" class="dock-dot" data-page-target="3" title="Trang 4: Xin cảm ơn đã lắng nghe"></button>
+    </div>
+
+    <span id="nav-page-label" class="hidden md:inline-block font-rounded text-[11px] font-bold opacity-80 pr-1 select-none">
+      1/4 • Mở đầu
+    </span>
+
+    <button id="btn-nav-next" type="button" class="dock-btn" title="Tiến về trang tiếp theo (Phím mũi tên phải)">
+      <span class="hidden sm:inline">Tiến về trước</span>
+      <span class="sm:hidden">Tiếp</span>
+      <span>→</span>
+    </button>
+  </nav>
+
+  <!-- ==================== APPLICATION LOGIC (PHYSICS ENGINE & UI) ==================== -->
+  <script>
+    (function () {
+      'use strict';
+
+      // =========================================================================
+      // 0. INTRO / STAR / LAB / THANK YOU — DIRECTIONAL PAGE NAVIGATION ENGINE
+      // =========================================================================
+      // 0. INTRO / WELCOME SCREEN & STAR TRANSITION LOGIC (TỔ HAI)
+      // =========================================================================
+      const TEAM_MEMBERS = [
+        'Nguyễn Trần Thanh Xuân',
+        'Nguyễn Thị Thu Ngọc',
+        'Nguyễn Thị Ngọc Liên',
+        'Huỳnh Lê Thu Trinh',
+        'Lê Thị Thảo Duyên',
+        'Trần Phương Phúc',
+        'Võ Ngọc Quỳnh Anh',
+        'Nguyễn Huỳnh Phúc Thịnh',
+        'Phạm Thị Trúc Lam',
+        'Nguyễn Anh Thư',
+        'Bùi Xuân Khoa',
+        'Cao Thị Ngọc Hương'
+      ];
+
+      const introEl = {
+        overlay: document.getElementById('intro-overlay'),
+        greeting: document.getElementById('intro-greeting'),
+        membersGrid: document.getElementById('intro-members-grid'),
+        ctaWrap: document.getElementById('intro-cta-wrap'),
+        btnStartLab: document.getElementById('btn-start-lab'),
+        btnBackIntro: document.getElementById('btn-back-intro'),
+        btnReplayIntro: document.getElementById('btn-replay-intro'),
+
+        // Screen 2: Pure White Star & Neon "Tổ 2" Transition
+        starOverlay: document.getElementById('star-transition-overlay'),
+        starMorphWrap: document.getElementById('star-morph-wrap'),
+        neonTo2Title: document.getElementById('neon-to2-title'),
+        transitionCtaWrap: document.getElementById('transition-cta-wrap'),
+        btnContinueLab: document.getElementById('btn-continue-lab'),
+        btnStarBackIntro: document.getElementById('btn-star-back-intro'),
+        btnReplayStar: document.getElementById('btn-replay-star'),
+
+        // Screen 3: Main Lab Wrapper
+        mainLabWrapper: document.getElementById('main-lab-wrapper'),
+        btnGoThankYou: document.getElementById('btn-go-thankyou'),
+
+        // Screen 4: Thank You Ending Screen
+        thankYouOverlay: document.getElementById('thankyou-overlay'),
+        btnThankYouBackLab: document.getElementById('btn-thankyou-back-lab'),
+        btnThankYouRestart: document.getElementById('btn-thankyou-restart'),
+        btnReplayThankYou: document.getElementById('btn-replay-thankyou'),
+
+        // Unified Page Navigation Dock
+        pageNavDock: document.getElementById('page-nav-dock'),
+        btnNavPrev: document.getElementById('btn-nav-prev'),
+        btnNavNext: document.getElementById('btn-nav-next'),
+        navPageLabel: document.getElementById('nav-page-label'),
+        navDots: Array.from(document.querySelectorAll('.dock-dot')),
+
+        // Bottom Dissolving Member Ticker
+        tickerStage: document.getElementById('member-ticker-stage')
+      };
+
+      // Danh sách 4 trang theo thứ tự trình chiếu
+      const PAGES = [
+        { el: introEl.overlay, label: '1/4 • Mở đầu', dockTheme: 'dock-light' },
+        { el: introEl.starOverlay, label: '2/4 • Tổ 2', dockTheme: 'dock-light' },
+        { el: introEl.mainLabWrapper, label: '3/4 • Thực hành', dockTheme: 'dock-sky' },
+        { el: introEl.thankYouOverlay, label: '4/4 • Cảm ơn', dockTheme: 'dock-light' }
+      ];
+
+      let currentPageIndex = 0;
+
+      /**
+       * Tạo 12 thẻ thành viên với độ lệch chéo (diagonal cascade) mượt mà từ trái sang phải.
+       */
+      function renderIntroMembers() {
+        introEl.membersGrid.innerHTML = '';
+        const isDesktop = window.innerWidth >= 1024;
+        const isTablet = window.innerWidth >= 640 && window.innerWidth < 1024;
+
+        TEAM_MEMBERS.forEach((name, idx) => {
+          const card = document.createElement('div');
+          card.className = 'member-card group flex items-center gap-3 px-4 py-3 rounded-2xl bg-white/90 hover:bg-white border border-slate-200/90 hover:border-sky-300 shadow-[0_6px_18px_-6px_rgba(12,33,61,0.10)] hover:shadow-[0_12px_24px_-8px_rgba(14,165,233,0.22)]';
+
+          // Tính khoảng chênh lệch chéo theo cột (trái -> phải thấp dần tinh tế)
+          let diagY = 0;
+          let diagX = 0;
+          if (isDesktop) {
+            const col = idx % 4;
+            diagY = col * 14;
+            diagX = col * 4;
+          } else if (isTablet) {
+            const col = idx % 2;
+            diagY = col * 12;
+            diagX = col * 6;
+          } else {
+            // Mobile: lệch nhẹ sang phải theo bậc thang để không tràn ngang
+            diagX = (idx % 3) * 8;
+          }
+
+          card.style.setProperty('--diag-y', `${diagY}px`);
+          card.style.setProperty('--diag-x', `${diagX}px`);
+
+          const numStr = String(idx + 1).padStart(2, '0');
+          card.innerHTML = `
+            <span class="w-7 h-7 rounded-xl bg-slate-100 group-hover:bg-sky-50 text-[#0c213d] group-hover:text-sky-600 font-mono text-xs font-extrabold flex items-center justify-center shrink-0 transition-colors">
+              ${numStr}
+            </span>
+            <span class="text-xs sm:text-[13.5px] font-bold text-[#0c213d] leading-snug tracking-tight">
+              ${name}
+            </span>
+          `;
+          introEl.membersGrid.appendChild(card);
+        });
+      }
+
+      /**
+       * Chạy lại hiệu ứng xuất hiện mượt mà của lời chào và 12 tên thành viên lần lượt từ trái sang phải.
+       */
+      function playIntroAnimations() {
+        renderIntroMembers();
+
+        // Reset animation của lời chào & nút Bắt đầu
+        const greetingNodes = introEl.overlay.querySelectorAll('.greeting-animate');
+        greetingNodes.forEach((node) => {
+          node.style.animation = 'none';
+          void node.offsetWidth; // Force reflow để phát lại animation
+          node.style.animation = '';
+        });
+
+        // Kích hoạt từng thẻ thành viên xuất hiện lần lượt từ trái sang phải
+        const cards = introEl.membersGrid.querySelectorAll('.member-card');
+        cards.forEach((card, idx) => {
+          card.classList.remove('is-entering');
+          void card.offsetWidth;
+          // Trễ tăng dần mượt mà: thành viên đầu xuất hiện sau lời chào một chút
+          card.style.animationDelay = `${0.32 + idx * 0.11}s`;
+          card.classList.add('is-entering');
+        });
+      }
+
+      /**
+       * Chạy hiệu ứng ngôi sao quay tròn chậm từ lớn sang bé và hiện tựa đề Tổ 2 neon bo tròn.
+       */
+      function playStarTransitionAnimations() {
+        const nodes = [introEl.starMorphWrap, introEl.neonTo2Title, introEl.transitionCtaWrap];
+        nodes.forEach((node) => {
+          node.classList.remove('is-playing');
+          void node.offsetWidth;
+          node.classList.add('is-playing');
+        });
+      }
+
+      /**
+       * Chạy hiệu ứng hiện dần từ bên trái qua cho trang "xin cảm ơn đã lắng nghe".
+       */
+      function playThankYouAnimations() {
+        const nodes = introEl.thankYouOverlay.querySelectorAll('.thankyou-ltr');
+        nodes.forEach((node) => {
+          node.classList.remove('is-revealing');
+          void node.offsetWidth;
+          node.classList.add('is-revealing');
+        });
+      }
+
+      /**
+       * Cập nhật giao diện thanh điều hướng (nút Trở về trước / Tiến về trước & chấm trạng thái).
+       */
+      function updatePageNavDock() {
+        const pageMeta = PAGES[currentPageIndex];
+        introEl.btnNavPrev.disabled = currentPageIndex === 0;
+        introEl.btnNavNext.disabled = currentPageIndex === PAGES.length - 1;
+        introEl.navPageLabel.textContent = pageMeta.label;
+
+        introEl.pageNavDock.classList.remove('dock-light', 'dock-sky');
+        introEl.pageNavDock.classList.add(pageMeta.dockTheme);
+
+        introEl.navDots.forEach((dot, idx) => {
+          dot.classList.toggle('is-active', idx === currentPageIndex);
+        });
+      }
+
+      /**
+       * Điều hướng chuyển trang có hiệu ứng trượt mượt mà tùy theo hướng tiến (trái ← phải) hay lùi (trái → phải).
+       */
+      function navigateToPage(targetIndex) {
+        if (targetIndex < 0 || targetIndex >= PAGES.length || targetIndex === currentPageIndex) {
+          return;
+        }
+
+        const prevIndex = currentPageIndex;
+        const movingForward = targetIndex > prevIndex;
+
+        // Sắp xếp lại các trang trung gian không tham gia hiệu ứng mà không gây chớp nháy
+        PAGES.forEach((pageObj, idx) => {
+          const node = pageObj.el;
+          if (idx !== prevIndex && idx !== targetIndex) {
+            node.classList.add('no-transition');
+            node.classList.remove('page-active', 'page-left', 'page-right');
+            node.classList.add(idx < targetIndex ? 'page-left' : 'page-right');
+            void node.offsetWidth;
+            node.classList.remove('no-transition');
+          }
+        });
+
+        // Đảm bảo trang đích xuất phát đúng phía (tiến: từ bên phải vào; lùi: từ bên trái vào)
+        const incomingNode = PAGES[targetIndex].el;
+        const outgoingNode = PAGES[prevIndex].el;
+
+        incomingNode.classList.add('no-transition');
+        incomingNode.classList.remove('page-active', 'page-left', 'page-right');
+        incomingNode.classList.add(movingForward ? 'page-right' : 'page-left');
+        incomingNode.scrollTop = 0;
+        void incomingNode.offsetWidth;
+        incomingNode.classList.remove('no-transition');
+
+        // Thực hiện chuyển động trượt song song mượt mà giữa trang cũ và trang mới
+        outgoingNode.classList.remove('page-active', 'page-left', 'page-right');
+        outgoingNode.classList.add(movingForward ? 'page-left' : 'page-right');
+
+        incomingNode.classList.remove('page-left', 'page-right');
+        incomingNode.classList.add('page-active');
+
+        currentPageIndex = targetIndex;
+        updatePageNavDock();
+
+        // Kích hoạt hiệu ứng đặc trưng của từng trang ngay khi trượt vào
+        requestAnimationFrame(() => {
+          if (targetIndex === 0) {
+            playIntroAnimations();
+          } else if (targetIndex === 1) {
+            playStarTransitionAnimations();
+          } else if (targetIndex === 2) {
+            startMemberTicker();
+          } else if (targetIndex === 3) {
+            playThankYouAnimations();
+          }
+        });
+      }
+
+      // Gắn sự kiện cho các nút chuyển trang trên từng màn hình & thanh điều hướng
+      introEl.btnStartLab.addEventListener('click', () => navigateToPage(1));
+      introEl.btnContinueLab.addEventListener('click', () => navigateToPage(2));
+      introEl.btnStarBackIntro.addEventListener('click', () => navigateToPage(0));
+      introEl.btnReplayStar.addEventListener('click', playStarTransitionAnimations);
+      introEl.btnBackIntro.addEventListener('click', () => navigateToPage(0));
+      introEl.btnGoThankYou.addEventListener('click', () => navigateToPage(3));
+      introEl.btnReplayIntro.addEventListener('click', playIntroAnimations);
+
+      introEl.btnThankYouBackLab.addEventListener('click', () => navigateToPage(2));
+      introEl.btnThankYouRestart.addEventListener('click', () => navigateToPage(0));
+      introEl.btnReplayThankYou.addEventListener('click', playThankYouAnimations);
+
+      introEl.btnNavPrev.addEventListener('click', () => navigateToPage(currentPageIndex - 1));
+      introEl.btnNavNext.addEventListener('click', () => navigateToPage(currentPageIndex + 1));
+      introEl.navDots.forEach((dot) => {
+        dot.addEventListener('click', () => {
+          const target = parseInt(dot.getAttribute('data-page-target'), 10);
+          navigateToPage(target);
+        });
+      });
+
+      // Hỗ trợ bấm phím mũi tên Trái / Phải để chuyển trang khi thuyết trình
+      document.addEventListener('keydown', (e) => {
+        const activeTag = document.activeElement && document.activeElement.tagName;
+        if (activeTag === 'INPUT' || activeTag === 'TEXTAREA' || activeTag === 'SELECT') return;
+        if (e.key === 'ArrowRight') {
+          navigateToPage(currentPageIndex + 1);
+        } else if (e.key === 'ArrowLeft') {
+          navigateToPage(currentPageIndex - 1);
+        }
+      });
+
+      // Mỗi lần người dùng thoát sang tab/cửa sổ khác rồi quay lại -> phát lại hiệu ứng trang hiện tại
+      document.addEventListener('visibilitychange', () => {
+        if (document.hidden) return;
+        if (currentPageIndex === 0) {
+          playIntroAnimations();
+        } else if (currentPageIndex === 1) {
+          playStarTransitionAnimations();
+        } else if (currentPageIndex === 3) {
+          playThankYouAnimations();
+        }
+      });
+
+      // Tự động cập nhật độ lệch chéo khi thay đổi kích thước màn hình
+      let resizeIntroTimer = null;
+      window.addEventListener('resize', () => {
+        if (currentPageIndex !== 0) return;
+        clearTimeout(resizeIntroTimer);
+        resizeIntroTimer = setTimeout(() => {
+          playIntroAnimations();
+        }, 200);
+      });
+
+      // =========================================================================
+      // 0.5. BOTTOM CONTINUOUS MEMBER TICKER WITH GENTLE STROKE-DISSOLVE EFFECT
+      // =========================================================================
+      const tickerState = {
+        running: false,
+        nextMemberIdx: 0,
+        items: [],
+        lastTime: 0,
+        speedPxPerSec: 88,
+        gapPx: 54
+      };
+
+      function createTickerMemberNode(name) {
+        const spanWrap = document.createElement('div');
+        spanWrap.className = 'ticker-member-item';
+        // Tách từng ký tự để khi tiêu biến các nét chữ mờ dần mềm mại nối tiếp nhau
+        const chars = Array.from(name);
+        chars.forEach((ch, idx) => {
+          const chSpan = document.createElement('span');
+          chSpan.className = 'ticker-char';
+          chSpan.textContent = ch === ' ' ? '\u00A0' : ch;
+          chSpan.style.transitionDelay = `${idx * 24}ms`;
+          spanWrap.appendChild(chSpan);
+        });
+        return spanWrap;
+      }
+
+      function spawnTickerMember(startX) {
+        const name = TEAM_MEMBERS[tickerState.nextMemberIdx];
+        tickerState.nextMemberIdx = (tickerState.nextMemberIdx + 1) % TEAM_MEMBERS.length;
+
+        const node = createTickerMemberNode(name);
+        introEl.tickerStage.appendChild(node);
+        const width = node.getBoundingClientRect().width || 180;
+
+        const item = {
+          node,
+          x: startX,
+          width,
+          dissolving: false,
+          dissolveStartedAt: 0
+        };
+        node.style.transform = `translate3d(${item.x}px, -50%, 0)`;
+        tickerState.items.push(item);
+      }
+
+      function startMemberTicker() {
+        if (tickerState.running) return;
+        tickerState.running = true;
+        tickerState.lastTime = performance.now();
+
+        const stageWidth = introEl.tickerStage.clientWidth || window.innerWidth;
+        if (tickerState.items.length === 0) {
+          spawnTickerMember(stageWidth + 20);
+        }
+        requestAnimationFrame(stepMemberTicker);
+      }
+
+      function stepMemberTicker(now) {
+        if (!tickerState.running) return;
+        const dt = Math.min((now - tickerState.lastTime) / 1000, 0.08);
+        tickerState.lastTime = now;
+
+        const stageWidth = introEl.tickerStage.clientWidth || window.innerWidth;
+
+        // Di chuyển mượt mà các tên từ phải sang trái
+        for (let i = 0; i < tickerState.items.length; i++) {
+          const item = tickerState.items[i];
+          item.x -= tickerState.speedPxPerSec * dt;
+          item.node.style.transform = `translate3d(${item.x.toFixed(1)}px, -50%, 0)`;
+        }
+
+        // Luôn nạp thêm tên mới ở phía phải ngay khi tên cuối cùng đã vào hết khung + khoảng cách
+        const lastItem = tickerState.items[tickerState.items.length - 1];
+        if (!lastItem || (lastItem.x + lastItem.width + tickerState.gapPx <= stageWidth + 40)) {
+          const nextStart = lastItem
+            ? Math.max(stageWidth + 10, lastItem.x + lastItem.width + tickerState.gapPx)
+            : stageWidth + 10;
+          spawnTickerMember(nextStart);
+        }
+
+        // Quy tắc tiêu biến: khi chạy hết một tên và đến một nửa tên người kế tiếp
+        // (tên sau đã đi vào >= 50% chiều rộng của nó trong vùng hiển thị), tên phía trước tiêu biến nhẹ nhàng
+        for (let i = 0; i < tickerState.items.length - 1; i++) {
+          const prevItem = tickerState.items[i];
+          const nextItem = tickerState.items[i + 1];
+          const prevFullyEntered = (prevItem.x + prevItem.width) <= stageWidth;
+          const nextHalfEntered = (stageWidth - nextItem.x) >= (nextItem.width * 0.5);
+
+          if (!prevItem.dissolving && prevFullyEntered && nextHalfEntered) {
+            prevItem.dissolving = true;
+            prevItem.dissolveStartedAt = now;
+            prevItem.node.classList.add('is-dissolving');
+          }
+        }
+
+        // Dọn dẹp các tên đã tiêu biến xong hoàn toàn hoặc đã trôi khỏi khung
+        for (let i = tickerState.items.length - 1; i >= 0; i--) {
+          const item = tickerState.items[i];
+          const finishedDissolve = item.dissolving && (now - item.dissolveStartedAt > 1450);
+          const offLeft = (item.x + item.width) < -60;
+          if (finishedDissolve || offLeft) {
+            item.node.remove();
+            tickerState.items.splice(i, 1);
+          }
+        }
+
+        requestAnimationFrame(stepMemberTicker);
+      }
+
+      // =========================================================================
+      // 1. STATE & CONSTANTS
+      // =========================================================================
+      const BASE_MAGNET_MASS_G = 450.00; // Khối lượng nam châm chữ U ban đầu (g)
+
+      const state = {
+        // Flow & Modes
+        currentStep: 1,
+        mode: 'guided', // 'guided' | 'free'
+        hideTrueB: false,
+        showBField: true,
+        showLeftHand: false,
+        coilLowered: true,
+
+        // Physics Parameters
+        B_true: 0.045,     // Tesla (T)
+        switchClosed: false,
+        direction: 1,      // +1: Thuận (F_từ lên, F'_nén xuống, cân tăng) | -1: Nghịch (cân giảm)
+        I: 1.00,           // Ampe (A)
+        N: 100,            // Số vòng dây
+        l_cm: 5.0,         // Chiều dài cạnh đáy (cm)
+        alpha: 90,         // Góc giữa khung dây và B (độ)
+        g: 9.80,           // Gia tốc trọng trường (m/s^2)
+        tared: false,      // Trạng thái trừ bì cân điện tử
+
+        // Live Dynamic Values (for damped oscillation)
+        currentNoiseG: 0,
+        targetDeltaM: 0,
+        displayedMass: BASE_MAGNET_MASS_G,
+        animStartMass: BASE_MAGNET_MASS_G,
+        animStartTime: 0,
+        isAnimatingScale: false,
+
+        // Recorded Trials
+        records: []
+      };
+
+      // Step Metadata for Interactive 5-Step Flow
+      const STEPS = [
+        {
+          id: 1,
+          short: 'Lắp đặt',
+          title: 'Bước 1: Lắp đặt & Căn chỉnh góc (α = 90°)',
+          desc: 'Hạ khung dây vào khe giữa hai cực nam châm chữ U đặt trên cân điện tử (không chạm thành nam châm). Căn chỉnh khung dây vuông góc đường sức từ (α = 90° ⇒ sinα = 1) để lực từ đạt cực đại F = B·I·N·l.'
+        },
+        {
+          id: 2,
+          short: 'Trừ bì cân',
+          title: 'Bước 2: Hiệu chỉnh cân về 0 (Trừ bì - Tare)',
+          desc: 'Khóa K đang mở (I = 0 A). Cân hiển thị khối lượng nam châm m₁ = 450.00 g. Hãy bấm nút TARE (0.00) đang phát sáng trên cân điện tử để đưa số chỉ về 0.00 g trước khi đo.'
+        },
+        {
+          id: 3,
+          short: 'Đóng khóa K',
+          title: 'Bước 3: Đóng mạch & Quan sát cặp lực Định luật III Newton',
+          desc: 'Đóng khóa K để dòng điện chạy qua khung dây. Từ trường tác dụng lực từ F⃗ từ lên cạnh đáy khung dây; đồng thời theo Định luật III Newton, khung dây tác dụng phản lực F⃗\' nén ngược xuống nam châm làm số chỉ cân dao động tắt dần rồi tăng thêm +Δm.'
+        },
+        {
+          id: 4,
+          short: 'Biến trở & Đảo chiều',
+          title: 'Bước 4: Thay đổi cường độ I & Đảo chiều dòng điện',
+          desc: 'Kéo thanh trượt biến trở thay đổi I (từ 0.2 A đến 2.0 A) và bấm nút Đảo chiều (+I / −I). Khi đổi chiều dòng điện, phản lực hướng lên trên làm số chỉ cân giảm xuống (−Δm) với cùng độ lớn.'
+        },
+        {
+          id: 5,
+          short: 'Ghi số liệu',
+          title: 'Bước 5: Ghi số liệu thực nghiệm & Xử lí sai số',
+          desc: 'Bấm "Ghi kết quả vào bảng" ở 3–5 giá trị cường độ I khác nhau. Hệ thống tự động tính giá trị trung bình B̄, sai số tuyệt đối trung bình ΔB̄ và dựng đồ thị tuyến tính F theo I.'
+        }
+      ];
+
+      // =========================================================================
+      // 2. DOM REFERENCES
+      // =========================================================================
+      const el = {
+        stepperBar: document.getElementById('stepper-bar'),
+        stepGuideCard: document.getElementById('step-guide-card'),
+        stepBadge: document.getElementById('step-badge'),
+        stepTitle: document.getElementById('step-title'),
+        stepDesc: document.getElementById('step-desc'),
+        btnPrevStep: document.getElementById('btn-prev-step'),
+        btnNextStep: document.getElementById('btn-next-step'),
+
+        // Global Controls
+        btnModeGuided: document.getElementById('btn-mode-guided'),
+        btnModeFree: document.getElementById('btn-mode-free'),
+        btnToggleQuiz: document.getElementById('btn-toggle-quiz'),
+        quizIcon: document.getElementById('quiz-icon'),
+        quizLabel: document.getElementById('quiz-label'),
+        btnTheme: document.getElementById('btn-theme'),
+        themeIcon: document.getElementById('theme-icon'),
+
+        // Stage Quick Actions
+        btnCoilPos: document.getElementById('btn-coil-pos'),
+        btnToggleBField: document.getElementById('btn-toggle-bfield'),
+        btnToggleLHR: document.getElementById('btn-toggle-lhr'),
+
+        // SVG Elements
+        coilAssembly: document.getElementById('coil-assembly'),
+        coilRotatable: document.getElementById('coil-rotatable'),
+        coilCurrentPath: document.getElementById('coil-current-path'),
+        coilIArrow: document.getElementById('coil-i-arrow'),
+        coilILine: document.getElementById('coil-i-line'),
+        coilILabel: document.getElementById('coil-i-label'),
+        svgCoilMeta: document.getElementById('svg-coil-meta'),
+        svgAlphaText: document.getElementById('svg-alpha-text'),
+
+        bFieldLayer: document.getElementById('b-field-layer'),
+        scalePanGroup: document.getElementById('scale-pan-group'),
+        magnetFrontGroup: document.getElementById('magnet-front-group'),
+        lcdMass: document.getElementById('lcd-mass'),
+        lcdTareBadge: document.getElementById('lcd-tare-badge'),
+        svgTareBtn: document.getElementById('svg-tare-btn'),
+        tareHighlightRing: document.getElementById('tare-highlight-ring'),
+
+        forceVectorsLayer: document.getElementById('force-vectors-layer'),
+        vecFCoil: document.getElementById('vec-f-coil'),
+        lblFCoilGroup: document.getElementById('lbl-f-coil-group'),
+        lblFCoil: document.getElementById('lbl-f-coil'),
+        vecFMagnet: document.getElementById('vec-f-magnet'),
+        lblFMagnetGroup: document.getElementById('lbl-f-magnet-group'),
+        lblFMagnet: document.getElementById('lbl-f-magnet'),
+
+        leftHandOverlay: document.getElementById('left-hand-overlay'),
+        leftHandGraphic: document.getElementById('left-hand-graphic'),
+
+        circuitFlowOverlay: document.getElementById('circuit-flow-overlay'),
+        svgSwitchK: document.getElementById('svg-switch-k'),
+        switchKPulse: document.getElementById('switch-k-pulse'),
+        switchKBlade: document.getElementById('switch-k-blade'),
+        switchKStateTxt: document.getElementById('switch-k-state-txt'),
+        svgReverseBtn: document.getElementById('svg-reverse-btn'),
+        revSvgTxt: document.getElementById('rev-svg-txt'),
+        rheostatWiper: document.getElementById('rheostat-wiper'),
+        svgAmmeterVal: document.getElementById('svg-ammeter-val'),
+
+        // Formula Decoding Pipeline
+        pipelineStatus: document.getElementById('pipeline-status'),
+        pipeAction: document.getElementById('pipe-action'),
+        pipeDm: document.getElementById('pipe-dm'),
+        pipeF: document.getElementById('pipe-f'),
+        pipeB: document.getElementById('pipe-b'),
+
+        // Quiz Panel
+        quizPanel: document.getElementById('quiz-panel'),
+        btnRandomizeB: document.getElementById('btn-randomize-b'),
+        quizInputB: document.getElementById('quiz-input-b'),
+        btnCheckQuiz: document.getElementById('btn-check-quiz'),
+        quizFeedback: document.getElementById('quiz-feedback'),
+
+        // Right Panel Controls
+        btnSwitchK: document.getElementById('btn-switch-k'),
+        ctrlKText: document.getElementById('ctrl-k-text'),
+        ctrlKDot: document.getElementById('ctrl-k-dot'),
+        btnReverseI: document.getElementById('btn-reverse-i'),
+        ctrlDirText: document.getElementById('ctrl-dir-text'),
+        sliderI: document.getElementById('slider-i'),
+        valI: document.getElementById('val-i'),
+        sliderN: document.getElementById('slider-n'),
+        valN: document.getElementById('val-n'),
+        sliderL: document.getElementById('slider-l'),
+        valL: document.getElementById('val-l'),
+        sliderAlpha: document.getElementById('slider-alpha'),
+        valAlpha: document.getElementById('val-alpha'),
+        inputG: document.getElementById('input-g'),
+        btnTarePanel: document.getElementById('btn-tare-panel'),
+        btnRecord: document.getElementById('btn-record'),
+        btnResetAll: document.getElementById('btn-reset-all'),
+
+        // Data Table & Graph
+        dataTableBody: document.getElementById('data-table-body'),
+        btnClearData: document.getElementById('btn-clear-data'),
+        statBMean: document.getElementById('stat-b-mean'),
+        statBErr: document.getElementById('stat-b-err'),
+        statBRel: document.getElementById('stat-b-rel'),
+        finalResultBox: document.getElementById('final-result-box'),
+        fiGraph: document.getElementById('fi-graph'),
+        graphSlopeLbl: document.getElementById('graph-slope-lbl'),
+        toastContainer: document.getElementById('toast-container')
+      };
+
+      // =========================================================================
+      // 3. PHYSICS ENGINE CORE
+      // =========================================================================
+      function computePhysics(generateNewNoise = false) {
+        const effectiveI = state.switchClosed ? state.I : 0;
+        const l_m = state.l_cm / 100;
+        const sinAlpha = Math.sin((state.alpha * Math.PI) / 180);
+        // Nếu khung dây chưa hạ vào khe nam châm, từ trường tác dụng coi như bằng 0
+        const B_eff = state.coilLowered ? state.B_true : 0;
+
+        // F = B * I * N * l * sin(alpha)
+        const F_exact = B_eff * effectiveI * state.N * l_m * sinAlpha;
+
+        // Sai số ngẫu nhiên của cân điện tử thực tế: [-0.01, +0.01] g khi có dòng đo
+        if (generateNewNoise) {
+          state.currentNoiseG = effectiveI > 0 && state.coilLowered && sinAlpha > 0
+            ? (Math.random() * 0.02 - 0.01)
+            : 0;
+        }
+
+        // Độ biến thiên khối lượng trên cân (g)
+        let deltaM_g = 0;
+        if (effectiveI > 0 && state.coilLowered && sinAlpha > 0) {
+          deltaM_g = state.direction * ((F_exact / state.g) * 1000) + state.currentNoiseG;
+        }
+
+        const baseDisplay = state.tared ? 0 : BASE_MAGNET_MASS_G;
+        const targetMass = baseDisplay + deltaM_g;
+
+        // Tính ngược lại F và B đo được từ số chỉ cân (đã bao gồm noise)
+        const F_measured = (Math.abs(deltaM_g) / 1000) * state.g;
+        const denom = effectiveI * state.N * l_m * sinAlpha;
+        const B_measured = denom > 1e-9 ? F_measured / denom : null;
+
+        return {
+          effectiveI,
+          l_m,
+          sinAlpha,
+          F_exact,
+          deltaM_g,
+          targetMass,
+          F_measured,
+          B_measured
+        };
+      }
+
+      // =========================================================================
+      // 4. DAMPED OSCILLATION ANIMATION FOR ELECTRONIC BALANCE (0.5s)
+      // =========================================================================
+      function triggerScaleAnimation(newTargetMass) {
+        state.animStartMass = state.displayedMass;
+        state.targetMass = newTargetMass;
+        state.animStartTime = performance.now();
+
+        if (!state.isAnimatingScale) {
+          state.isAnimatingScale = true;
+          requestAnimationFrame(stepScaleAnimation);
+        }
+      }
+
+      function stepScaleAnimation(now) {
+        const duration = 500; // 0.5 giây dao động tắt dần
+        const elapsed = now - state.animStartTime;
+        const t = Math.min(elapsed / duration, 1);
+
+        if (t < 1) {
+          // Hàm dao động điều hòa tắt dần: e^(-6t) * cos(2*pi*3*t)
+          const diff = state.animStartMass - state.targetMass;
+          const damped = diff * Math.exp(-6 * t) * Math.cos(2 * Math.PI * 2.8 * t);
+          state.displayedMass = state.targetMass + damped;
+          updateBalanceVisual(state.displayedMass);
+          requestAnimationFrame(stepScaleAnimation);
+        } else {
+          state.displayedMass = state.targetMass;
+          state.isAnimatingScale = false;
+          updateBalanceVisual(state.displayedMass);
+        }
+      }
+
+      function updateBalanceVisual(massValue) {
+        // Định dạng số chỉ LCD có dấu + khi đã trừ bì và > 0
+        let formatted = massValue.toFixed(2);
+        if (state.tared && massValue > 0.004) {
+          formatted = '+' + formatted;
+        }
+        el.lcdMass.textContent = `${formatted} g`;
+        el.lcdTareBadge.setAttribute('opacity', state.tared ? '1' : '0.2');
+
+        // Hiệu ứng cơ học: đĩa cân lún nhẹ (tối đa ±3.5px) theo lực nén/nâng
+        const base = state.tared ? 0 : BASE_MAGNET_MASS_G;
+        const dm = massValue - base;
+        const shiftY = Math.max(-3.5, Math.min(3.5, dm * 0.08));
+        el.scalePanGroup.style.transform = `translateY(${shiftY}px)`;
+        el.magnetFrontGroup.style.transform = `translateY(${shiftY}px)`;
+      }
+
+      // =========================================================================
+      // 5. RENDERING & UI SYNCHRONIZATION
+      // =========================================================================
+      function updateAll(generateNewNoise = false) {
+        const phys = computePhysics(generateNewNoise);
+
+        // 1. Trigger damped oscillation on scale if target changed
+        if (Math.abs(phys.targetMass - (state.targetMass ?? state.displayedMass)) > 0.001) {
+          triggerScaleAnimation(phys.targetMass);
+        } else if (!state.isAnimatingScale) {
+          state.displayedMass = phys.targetMass;
+          updateBalanceVisual(state.displayedMass);
+        }
+
+        // 2. Coil Position (Lowered vs Raised)
+        el.coilAssembly.style.transform = state.coilLowered ? 'translateY(0px)' : 'translateY(-74px)';
+        el.btnCoilPos.textContent = state.coilLowered ? '⬆️ Nâng khung dây' : '⬇️ Hạ khung dây';
+
+        // 3. Coil Rotation (Alpha) - scaleX simulates 3D rotation around vertical axis
+        const scaleX = Math.max(0.14, phys.sinAlpha);
+        el.coilRotatable.setAttribute('transform', `translate(300, 0) scale(${scaleX.toFixed(3)}, 1)`);
+        el.svgCoilMeta.textContent = `N = ${state.N} vòng | l = ${state.l_cm.toFixed(1)} cm`;
+        el.svgAlphaText.textContent = `α = ${state.alpha}°`;
+
+        // 4. B-Field & Left-Hand Rule Visibility
+        el.bFieldLayer.setAttribute('opacity', state.showBField ? '1' : '0');
+        el.btnToggleBField.textContent = state.showBField ? '🧲 Đường sức B: BẬT' : '🧲 Đường sức B: TẮT';
+        el.leftHandOverlay.classList.toggle('hidden', !state.showLeftHand);
+
+        // Flip Left-Hand Graphic when current reverses!
+        // Thuận (+1): Fingers right (+I), Thumb up (+F_từ) -> scale(1, 1)
+        // Nghịch (-1): Fingers left (-I), Thumb down (-F_từ) -> rotate(180)
+        if (state.direction === 1) {
+          el.leftHandGraphic.setAttribute('transform', 'translate(300, 244) rotate(0)');
+        } else {
+          el.leftHandGraphic.setAttribute('transform', 'translate(300, 244) rotate(180)');
+        }
+
+        // 5. Switch K & Reversing Switch & Rheostat & Ammeter SVG
+        if (state.switchClosed) {
+          el.switchKBlade.setAttribute('x2', '68');
+          el.switchKBlade.setAttribute('y2', '34');
+          el.switchKBlade.setAttribute('stroke', '#10b981');
+          el.switchKStateTxt.textContent = 'ĐÓNG';
+          el.switchKStateTxt.setAttribute('fill', '#34d399');
+
+          el.ctrlKText.textContent = 'Khóa K: ĐANG ĐÓNG';
+          el.ctrlKText.className = 'text-sm font-extrabold';
+          el.ctrlKDot.className = 'w-4 h-4 rounded-full bg-emerald-400 border-2 border-white shadow-sm animate-pulse';
+          el.btnSwitchK.className = 'p-3 rounded-3xl border-2 border-white/65 bg-emerald-500/55 hover:bg-emerald-500/70 text-left transition flex items-center justify-between';
+        } else {
+          el.switchKBlade.setAttribute('x2', '62');
+          el.switchKBlade.setAttribute('y2', '18');
+          el.switchKBlade.setAttribute('stroke', '#facc15');
+          el.switchKStateTxt.textContent = 'MỞ';
+          el.switchKStateTxt.setAttribute('fill', '#f87171');
+
+          el.ctrlKText.textContent = 'Khóa K: MỞ (0 A)';
+          el.ctrlKText.className = 'text-sm font-extrabold';
+          el.ctrlKDot.className = 'w-4 h-4 rounded-full bg-rose-400 border-2 border-white shadow-sm';
+          el.btnSwitchK.className = 'p-3 rounded-3xl border-2 border-white/55 bg-rose-500/40 hover:bg-rose-500/55 text-left transition flex items-center justify-between';
+        }
+
+        if (state.direction === 1) {
+          el.revSvgTxt.textContent = 'Thuận (+I)';
+          el.ctrlDirText.textContent = 'Thuận (+I: Cân tăng)';
+        } else {
+          el.revSvgTxt.textContent = 'Nghịch (−I)';
+          el.ctrlDirText.textContent = 'Nghịch (−I: Cân giảm)';
+        }
+
+        // Rheostat wiper position (0A -> x=25, 2A -> x=175)
+        const wiperX = 25 + (state.I / 2.0) * 150;
+        el.rheostatWiper.setAttribute('transform', `translate(${wiperX.toFixed(1)}, 0)`);
+        el.svgAmmeterVal.textContent = `${phys.effectiveI.toFixed(2)} A`;
+
+        // 6. Animated Current Particles & Coil Arrow
+        if (phys.effectiveI > 0) {
+          const flowClass = state.direction === 1 ? 'current-flow-forward' : 'current-flow-reverse';
+          // Animation speed scales with I
+          const speedSec = Math.max(0.22, 1.1 - state.I * 0.4).toFixed(2) + 's';
+
+          el.coilCurrentPath.setAttribute('opacity', '0.95');
+          el.coilCurrentPath.setAttribute('class', flowClass);
+          el.coilCurrentPath.style.animationDuration = speedSec;
+
+          el.circuitFlowOverlay.setAttribute('opacity', '0.85');
+          el.circuitFlowOverlay.setAttribute('class', flowClass);
+          el.circuitFlowOverlay.style.animationDuration = speedSec;
+
+          el.coilIArrow.setAttribute('opacity', '1');
+          if (state.direction === 1) {
+            el.coilILine.setAttribute('x1', '-24');
+            el.coilILine.setAttribute('x2', '24');
+            el.coilILabel.textContent = '+I';
+          } else {
+            el.coilILine.setAttribute('x1', '24');
+            el.coilILine.setAttribute('x2', '-24');
+            el.coilILabel.textContent = '−I';
+          }
+        } else {
+          el.coilCurrentPath.setAttribute('opacity', '0');
+          el.circuitFlowOverlay.setAttribute('opacity', '0');
+          el.coilIArrow.setAttribute('opacity', '0');
+        }
+
+        // 7. Newton's 3rd Law Force Vectors (Proportional Scaling!)
+        if (phys.F_exact > 0.0005) {
+          el.forceVectorsLayer.setAttribute('opacity', '1');
+          // Scale length smoothly between 26px and 92px proportional to F
+          const vecLen = Math.min(92, Math.max(26, phys.F_exact * 210));
+          const fText = `${phys.F_measured.toFixed(3)} N`;
+
+          if (state.direction === 1) {
+            // +I: F_từ hướng LÊN trên khung dây; F'_nén hướng XUỐNG đè nam châm
+            el.vecFCoil.setAttribute('y1', '277');
+            el.vecFCoil.setAttribute('y2', (277 - vecLen).toFixed(1));
+            el.lblFCoilGroup.setAttribute('transform', `translate(310, ${(277 - vecLen + 4).toFixed(1)})`);
+            el.lblFCoil.textContent = `F⃗ từ = ${fText}`;
+
+            el.vecFMagnet.setAttribute('y1', '304');
+            el.vecFMagnet.setAttribute('y2', (304 + vecLen).toFixed(1));
+            el.lblFMagnetGroup.setAttribute('transform', `translate(152, ${(304 + Math.min(vecLen, 62)).toFixed(1)})`);
+            el.lblFMagnet.textContent = `F⃗' nén = ${fText}`;
+          } else {
+            // -I: F_từ hướng XUỐNG trên khung dây; F'_nén hướng LÊN nâng nam châm
+            el.vecFCoil.setAttribute('y1', '277');
+            el.vecFCoil.setAttribute('y2', (277 + vecLen).toFixed(1));
+            el.lblFCoilGroup.setAttribute('transform', `translate(310, ${(277 + Math.min(vecLen, 62)).toFixed(1)})`);
+            el.lblFCoil.textContent = `F⃗ từ = ${fText}`;
+
+            el.vecFMagnet.setAttribute('y1', '304');
+            el.vecFMagnet.setAttribute('y2', (304 - vecLen).toFixed(1));
+            el.lblFMagnetGroup.setAttribute('transform', `translate(148, ${(304 - vecLen + 4).toFixed(1)})`);
+            el.lblFMagnet.textContent = `F⃗' nâng = ${fText}`;
+          }
+        } else {
+          el.forceVectorsLayer.setAttribute('opacity', '0');
+        }
+
+        // 8. Formula Decoding Pipeline
+        if (!state.switchClosed || phys.effectiveI === 0) {
+          el.pipelineStatus.textContent = 'Mạch đang mở (I = 0 A)';
+          el.pipeAction.textContent = 'Không có lực từ';
+          el.pipeDm.textContent = '0.00 g';
+          el.pipeF.textContent = '0.0000 N';
+          el.pipeB.textContent = '— T';
+        } else if (!state.coilLowered) {
+          el.pipelineStatus.textContent = 'Khung dây ở ngoài nam châm';
+          el.pipeAction.textContent = 'Ngoài từ trường';
+          el.pipeDm.textContent = '0.00 g';
+          el.pipeF.textContent = '0.0000 N';
+          el.pipeB.textContent = '— T';
+        } else if (state.alpha === 0) {
+          el.pipelineStatus.textContent = 'α = 0° (sinα = 0)';
+          el.pipeAction.textContent = 'F = 0 (song song B⃗)';
+          el.pipeDm.textContent = '0.00 g';
+          el.pipeF.textContent = '0.0000 N';
+          el.pipeB.textContent = '— T';
+        } else {
+          el.pipelineStatus.textContent = state.direction === 1 ? 'Đang nén xuống cân (+Δm)' : 'Đang nâng nam châm (−Δm)';
+          el.pipeAction.textContent = state.direction === 1 ? '⬇️ Đè xuống nam châm' : '⬆️ Nhấc nhẹ nam châm';
+          const sign = phys.deltaM_g >= 0 ? '+' : '';
+          el.pipeDm.textContent = `${sign}${phys.deltaM_g.toFixed(2)} g`;
+          el.pipeF.textContent = `${phys.F_measured.toFixed(4)} N`;
+          el.pipeB.textContent = state.hideTrueB
+            ? '? . ??? T (Đã ẩn)'
+            : `${phys.B_measured.toFixed(4)} T`;
+        }
+
+        // 9. Right Panel Labels
+        el.valI.textContent = `${state.I.toFixed(2)} A`;
+        el.valN.textContent = `${state.N} vòng`;
+        el.valL.textContent = `${state.l_cm.toFixed(1)} cm`;
+        el.valAlpha.textContent = `${state.alpha}° (sinα = ${phys.sinAlpha.toFixed(2)})`;
+
+        // 10. Step-specific Highlights on SVG
+        el.tareHighlightRing.classList.toggle('hidden', !(state.mode === 'guided' && state.currentStep === 2 && !state.tared));
+        el.switchKPulse.classList.toggle('hidden', !(state.mode === 'guided' && state.currentStep === 3 && !state.switchClosed));
+      }
+
+      // =========================================================================
+      // 6. STEPPER FLOW MANAGEMENT (BƯỚC 1 -> BƯỚC 5)
+      // =========================================================================
+      function renderStepper() {
+        el.stepperBar.innerHTML = '';
+        STEPS.forEach((step, idx) => {
+          const isActive = state.currentStep === step.id;
+          const isDone = state.currentStep > step.id;
+
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = `flex-1 flex items-center gap-2 px-3.5 py-1.5 rounded-full border text-left transition ${
+            isActive
+              ? 'bg-sky-600/85 border-white shadow-md'
+              : isDone
+                ? 'bg-emerald-500/45 border-white/65 hover:bg-emerald-500/60'
+                : 'bg-white/20 border-white/45 hover:bg-white/35'
+          }`;
+
+          btn.innerHTML = `
+            <span class="w-5 h-5 rounded-full text-[11px] font-extrabold flex items-center justify-center shrink-0 ${
+              isActive ? 'bg-white/30 border border-white' : isDone ? 'bg-emerald-400/70 border border-white' : 'bg-white/20 border border-white/50'
+            }">${isDone ? '✓' : step.id}</span>
+            <span class="text-xs font-bold truncate">${step.short}</span>
+          `;
+          btn.addEventListener('click', () => goToStep(step.id));
+          el.stepperBar.appendChild(btn);
+
+          if (idx < STEPS.length - 1) {
+            const sep = document.createElement('div');
+            sep.className = 'w-4 h-1 bg-white/45 shrink-0 rounded-full';
+            el.stepperBar.appendChild(sep);
+          }
+        });
+
+        // Update Guide Card
+        const activeStep = STEPS[state.currentStep - 1];
+        el.stepBadge.textContent = activeStep.id;
+        el.stepTitle.textContent = activeStep.title;
+        el.stepDesc.textContent = activeStep.desc;
+        el.btnPrevStep.disabled = state.currentStep === 1;
+        el.btnNextStep.disabled = state.currentStep === STEPS.length;
+        el.stepGuideCard.classList.toggle('hidden', state.mode === 'free');
+      }
+
+      function goToStep(stepId) {
+        state.currentStep = stepId;
+
+        if (state.mode === 'guided') {
+          if (stepId === 1) {
+            state.switchClosed = false;
+            state.alpha = 90;
+            el.sliderAlpha.value = 90;
+            state.showBField = true;
+            // Animate lowering the coil into the magnet gap
+            state.coilLowered = false;
+            updateAll(false);
+            setTimeout(() => {
+              state.coilLowered = true;
+              updateAll(false);
+            }, 220);
+          } else if (stepId === 2) {
+            state.coilLowered = true;
+            state.switchClosed = false;
+            state.tared = false;
+            updateAll(false);
+          } else if (stepId === 3) {
+            state.coilLowered = true;
+            state.tared = true;
+            state.direction = 1;
+            if (state.I < 0.2) {
+              state.I = 1.00;
+              el.sliderI.value = 1.00;
+            }
+            state.switchClosed = true;
+            updateAll(true);
+          } else if (stepId === 4) {
+            state.coilLowered = true;
+            state.tared = true;
+            state.switchClosed = true;
+            updateAll(true);
+          } else if (stepId === 5) {
+            state.coilLowered = true;
+            state.tared = true;
+            state.switchClosed = true;
+            updateAll(true);
+            el.dataCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          }
+        } else {
+          updateAll(false);
+        }
+        renderStepper();
+      }
+
+      // =========================================================================
+      // 7. DATA RECORDING, ERROR ANALYSIS & LINEAR GRAPH F(I)
+      // =========================================================================
+      function recordMeasurement() {
+        const phys = computePhysics(false);
+        if (!state.switchClosed || phys.effectiveI <= 0) {
+          showToast('Vui lòng đóng khóa K và chọn cường độ I > 0 A trước khi ghi số liệu.', 'warn');
+          return;
+        }
+        if (!state.coilLowered) {
+          showToast('Hãy hạ khung dây vào trong khe nam châm để thực hiện phép đo.', 'warn');
+          return;
+        }
+        if (state.alpha === 0) {
+          showToast('Góc α = 0° không tạo ra lực từ. Hãy tăng góc α > 0°.', 'warn');
+          return;
+        }
+
+        state.records.push({
+          id: Date.now(),
+          I: phys.effectiveI,
+          dm: Math.abs(phys.deltaM_g),
+          F: phys.F_measured,
+          B: phys.B_measured
+        });
+
+        renderDataTable();
+        renderGraph();
+        showToast(`Đã ghi lần đo #${state.records.length} (I = ${phys.effectiveI.toFixed(2)} A, |Δm| = ${Math.abs(phys.deltaM_g).toFixed(2)} g).`, 'success');
+      }
+
+      function renderDataTable() {
+        el.dataTableBody.innerHTML = '';
+
+        if (state.records.length === 0) {
+          el.dataTableBody.innerHTML = `
+            <tr>
+              <td colspan="6" class="px-3 py-5 text-center font-sans italic">
+                Chưa có số liệu. Hãy đóng khóa K, điều chỉnh I và bấm "Ghi kết quả vào bảng".
+              </td>
+            </tr>
+          `;
+          el.statBMean.textContent = '—';
+          el.statBErr.textContent = '—';
+          el.statBRel.textContent = '—';
+          el.finalResultBox.classList.add('hidden');
+          return;
+        }
+
+        state.records.forEach((rec, idx) => {
+          const tr = document.createElement('tr');
+          tr.className = 'hover:bg-white/15 transition';
+          tr.innerHTML = `
+            <td class="px-2.5 py-2 text-center font-sans font-extrabold">${idx + 1}</td>
+            <td class="px-2.5 py-2 text-right font-bold">${rec.I.toFixed(2)}</td>
+            <td class="px-2.5 py-2 text-right font-bold">${rec.dm.toFixed(2)}</td>
+            <td class="px-2.5 py-2 text-right font-bold">${rec.F.toFixed(4)}</td>
+            <td class="px-2.5 py-2 text-right font-extrabold">${state.hideTrueB ? '?.????' : rec.B.toFixed(4)}</td>
+            <td class="px-2 py-2 text-center">
+              <button data-id="${rec.id}" class="btn-del-row hover:scale-110 font-sans font-extrabold px-1.5 rounded-full" title="Xóa dòng này">✕</button>
+            </td>
+          `;
+          el.dataTableBody.appendChild(tr);
+        });
+
+        // Attach delete handlers
+        el.dataTableBody.querySelectorAll('.btn-del-row').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const id = Number(btn.getAttribute('data-id'));
+            state.records = state.records.filter(r => r.id !== id);
+            renderDataTable();
+            renderGraph();
+          });
+        });
+
+        // Compute Error Analysis
+        const n = state.records.length;
+        const bMean = state.records.reduce((s, r) => s + r.B, 0) / n;
+        const bMeanErr = state.records.reduce((s, r) => s + Math.abs(bMean - r.B), 0) / n;
+        const bRel = bMean > 0 ? (bMeanErr / bMean) * 100 : 0;
+
+        if (state.hideTrueB) {
+          el.statBMean.textContent = 'Đã ẩn';
+          el.statBErr.textContent = 'Đã ẩn';
+          el.statBRel.textContent = 'Đã ẩn';
+          el.finalResultBox.classList.add('hidden');
+        } else {
+          el.statBMean.textContent = `${bMean.toFixed(4)} T`;
+          el.statBErr.textContent = `${bMeanErr.toFixed(4)} T`;
+          el.statBRel.textContent = `${bRel.toFixed(2)} %`;
+          el.finalResultBox.classList.remove('hidden');
+          el.finalResultBox.textContent = `Kết quả đo: B = ${bMean.toFixed(4)} ± ${bMeanErr.toFixed(4)} (T)`;
+        }
+      }
+
+      function renderGraph() {
+        const W = 380, H = 190;
+        const padL = 46, padR = 16, padT = 16, padB = 30;
+        const plotW = W - padL - padR;
+        const plotH = H - padT - padB;
+
+        // Determine dynamic axis scales
+        const maxI = Math.max(2.0, ...state.records.map(r => r.I * 1.1));
+        const maxF = Math.max(0.5, ...state.records.map(r => r.F * 1.15));
+
+        const xOf = (iVal) => padL + (iVal / maxI) * plotW;
+        const yOf = (fVal) => padT + plotH - (fVal / maxF) * plotH;
+
+        let svg = '';
+
+        // Gridlines (4 horizontal, 4 vertical)
+        for (let k = 0; k <= 4; k++) {
+          const y = padT + (plotH * k) / 4;
+          const fTick = (maxF * (4 - k)) / 4;
+          svg += `<line x1="${padL}" y1="${y}" x2="${W - padR}" y2="${y}" stroke="#64748b" stroke-opacity="0.2" stroke-dasharray="3 3"/>`;
+          svg += `<text x="${padL - 6}" y="${y + 3}" text-anchor="end" fill="#94a3b8" font-size="9" font-family="JetBrains Mono">${fTick.toFixed(2)}</text>`;
+
+          const x = padL + (plotW * k) / 4;
+          const iTick = (maxI * k) / 4;
+          svg += `<line x1="${x}" y1="${padT}" x2="${x}" y2="${padT + plotH}" stroke="#64748b" stroke-opacity="0.2" stroke-dasharray="3 3"/>`;
+          svg += `<text x="${x}" y="${H - 12}" text-anchor="middle" fill="#94a3b8" font-size="9" font-family="JetBrains Mono">${iTick.toFixed(1)}</text>`;
+        }
+
+        // Axes
+        svg += `<line x1="${padL}" y1="${padT}" x2="${padL}" y2="${padT + plotH}" stroke="#94a3b8" stroke-width="1.5"/>`;
+        svg += `<line x1="${padL}" y1="${padT + plotH}" x2="${W - padR}" y2="${padT + plotH}" stroke="#94a3b8" stroke-width="1.5"/>`;
+
+        // Axis Labels
+        svg += `<text x="${padL + plotW / 2}" y="${H - 1}" text-anchor="middle" fill="#64748b" font-size="9.5" font-weight="700">I (A)</text>`;
+        svg += `<text x="12" y="${padT + plotH / 2}" text-anchor="middle" fill="#64748b" font-size="9.5" font-weight="700" transform="rotate(-90 12 ${padT + plotH / 2})">F (N)</text>`;
+
+        // Best-fit line through origin: F = k * I
+        if (state.records.length >= 1) {
+          let sumIF = 0, sumI2 = 0;
+          state.records.forEach(r => {
+            sumIF += r.I * r.F;
+            sumI2 += r.I * r.I;
+          });
+          const slope = sumI2 > 0 ? sumIF / sumI2 : 0;
+          const endI = Math.min(maxI, slope > 0 ? maxF / slope : maxI);
+          const endF = slope * endI;
+
+          svg += `<line x1="${xOf(0)}" y1="${yOf(0)}" x2="${xOf(endI)}" y2="${yOf(endF)}" stroke="#0ea5e9" stroke-width="2" stroke-dasharray="5 3"/>`;
+          el.graphSlopeLbl.textContent = `Hệ số góc k = ${slope.toFixed(3)} N/A`;
+        } else {
+          el.graphSlopeLbl.textContent = 'Hệ số góc k = —';
+        }
+
+        // Data Points
+        state.records.forEach((r, idx) => {
+          const cx = xOf(r.I);
+          const cy = yOf(r.F);
+          svg += `<circle cx="${cx}" cy="${cy}" r="4.5" fill="#f97316" stroke="#ffffff" stroke-width="1.5"><title>Lần ${idx + 1}: I=${r.I.toFixed(2)}A, F=${r.F.toFixed(4)}N</title></circle>`;
+        });
+
+        el.fiGraph.innerHTML = svg;
+      }
+
+      // =========================================================================
+      // 8. TOAST HELPER (NO ALERT())
+      // =========================================================================
+      function showToast(message, type = 'info') {
+        const toast = document.createElement('div');
+        const colors = {
+          success: 'bg-emerald-600 text-white border-emerald-400',
+          warn: 'bg-amber-600 text-white border-amber-400',
+          info: 'bg-slate-800 text-white border-slate-600'
+        };
+        toast.className = `pointer-events-auto max-w-sm px-3.5 py-2.5 rounded-xl border shadow-lg text-xs sm:text-sm font-semibold transition-all duration-300 opacity-0 translate-y-2 ${colors[type] || colors.info}`;
+        toast.textContent = message;
+        el.toastContainer.appendChild(toast);
+
+        requestAnimationFrame(() => {
+          toast.classList.remove('opacity-0', 'translate-y-2');
+        });
+
+        setTimeout(() => {
+          toast.classList.add('opacity-0', 'translate-y-2');
+          setTimeout(() => toast.remove(), 300);
+        }, 3000);
+      }
+
+      // =========================================================================
+      // 9. EVENT LISTENERS
+      // =========================================================================
+      // Sky Blue Tone Toggle (Sáng trời <-> Xanh đậm dịu)
+      el.btnTheme.addEventListener('click', () => {
+        const isNightSky = document.documentElement.classList.toggle('sky-night');
+        el.themeIcon.textContent = isNightSky ? '🌌' : '🌤️';
+      });
+
+      // Mode Toggle (Guided vs Free)
+      el.btnModeGuided.addEventListener('click', () => {
+        state.mode = 'guided';
+        el.btnModeGuided.className = 'px-3 py-1 rounded-full bg-sky-600/80 shadow-sm transition';
+        el.btnModeFree.className = 'px-3 py-1 rounded-full hover:bg-white/20 transition';
+        renderStepper();
+        updateAll(false);
+      });
+
+      el.btnModeFree.addEventListener('click', () => {
+        state.mode = 'free';
+        el.btnModeFree.className = 'px-3 py-1 rounded-full bg-sky-600/80 shadow-sm transition';
+        el.btnModeGuided.className = 'px-3 py-1 rounded-full hover:bg-white/20 transition';
+        renderStepper();
+        updateAll(false);
+      });
+
+      // Quiz Mode Toggle (Hide/Show B_true)
+      function updateQuizUI() {
+        el.quizPanel.classList.toggle('hidden', !state.hideTrueB);
+        el.quizIcon.textContent = state.hideTrueB ? '🙈' : '👁️';
+        el.quizLabel.textContent = state.hideTrueB
+          ? 'Đang ẩn B thật (Kiểm tra)'
+          : `Hiện B thật: ${state.B_true.toFixed(3)} T`;
+        el.quizFeedback.classList.add('hidden');
+        renderDataTable();
+        updateAll(false);
+      }
+
+      el.btnToggleQuiz.addEventListener('click', () => {
+        state.hideTrueB = !state.hideTrueB;
+        updateQuizUI();
+      });
+
+      el.btnRandomizeB.addEventListener('click', () => {
+        // Random B between 0.025 and 0.085 T (step 0.005)
+        const steps = Math.floor(Math.random() * 13);
+        state.B_true = Number((0.025 + steps * 0.005).toFixed(3));
+        state.records = [];
+        el.quizInputB.value = '';
+        el.quizFeedback.classList.add('hidden');
+        renderDataTable();
+        renderGraph();
+        updateAll(true);
+        showToast('Đã thay nam châm chữ U mới! Hãy đo lại để tìm giá trị B.', 'info');
+      });
+
+      el.btnCheckQuiz.addEventListener('click', () => {
+        const val = parseFloat(el.quizInputB.value);
+        if (isNaN(val) || val <= 0) {
+          showToast('Vui lòng nhập một số dương hợp lệ cho cảm ứng từ B (đơn vị Tesla).', 'warn');
+          return;
+        }
+        const relErr = Math.abs(val - state.B_true) / state.B_true;
+        el.quizFeedback.classList.remove('hidden');
+
+        if (relErr <= 0.03) {
+          el.quizFeedback.className = 'mt-2.5 text-xs sm:text-sm font-bold rounded-full px-4 py-2 bg-emerald-500/60 border border-white/60';
+          el.quizFeedback.textContent = `🎉 Chính xác xuất sắc! B thật = ${state.B_true.toFixed(3)} T (sai lệch ${(relErr * 100).toFixed(2)}%).`;
+        } else if (relErr <= 0.08) {
+          el.quizFeedback.className = 'mt-2.5 text-xs sm:text-sm font-bold rounded-full px-4 py-2 bg-amber-500/60 border border-white/60';
+          el.quizFeedback.textContent = `👍 Gần đúng! Bạn tính ${val.toFixed(4)} T (sai lệch ${(relErr * 100).toFixed(1)}%). Hãy kiểm tra lại đơn vị cm → m và g → kg nhé!`;
+        } else {
+          el.quizFeedback.className = 'mt-2.5 text-xs sm:text-sm font-bold rounded-full px-4 py-2 bg-rose-500/60 border border-white/60';
+          el.quizFeedback.textContent = `❌ Chưa chính xác. Gợi ý: Đổi Δm từ gam sang kg (÷1000), đổi l từ cm sang m (÷100), rồi dùng B = (|Δm|·g) / (I·N·l·sinα).`;
+        }
+      });
+
+      // Stepper Prev / Next
+      el.btnPrevStep.addEventListener('click', () => {
+        if (state.currentStep > 1) goToStep(state.currentStep - 1);
+      });
+      el.btnNextStep.addEventListener('click', () => {
+        if (state.currentStep < STEPS.length) goToStep(state.currentStep + 1);
+      });
+
+      // Stage Quick Toggles
+      el.btnCoilPos.addEventListener('click', () => {
+        state.coilLowered = !state.coilLowered;
+        updateAll(true);
+      });
+      el.btnToggleBField.addEventListener('click', () => {
+        state.showBField = !state.showBField;
+        updateAll(false);
+      });
+      el.btnToggleLHR.addEventListener('click', () => {
+        state.showLeftHand = !state.showLeftHand;
+        updateAll(false);
+      });
+
+      // Switch K (Panel + SVG)
+      function toggleSwitchK() {
+        state.switchClosed = !state.switchClosed;
+        updateAll(true);
+      }
+      el.btnSwitchK.addEventListener('click', toggleSwitchK);
+      el.svgSwitchK.addEventListener('click', toggleSwitchK);
+
+      // Reversing Switch (Panel + SVG)
+      function toggleReverseI() {
+        state.direction *= -1;
+        updateAll(true);
+      }
+      el.btnReverseI.addEventListener('click', toggleReverseI);
+      el.svgReverseBtn.addEventListener('click', toggleReverseI);
+
+      // TARE Button (Panel + SVG)
+      function toggleTare() {
+        state.tared = !state.tared;
+        updateAll(false);
+        showToast(state.tared ? 'Đã trừ bì cân điện tử về 0.00 g (TARE).' : 'Đã tắt chế độ trừ bì (hiển thị tổng khối lượng).', 'info');
+      }
+      el.btnTarePanel.addEventListener('click', toggleTare);
+      el.svgTareBtn.addEventListener('click', toggleTare);
+
+      // Sliders & Numeric Inputs
+      el.sliderI.addEventListener('input', (e) => {
+        state.I = parseFloat(e.target.value);
+        updateAll(true);
+      });
+      el.sliderN.addEventListener('input', (e) => {
+        state.N = parseInt(e.target.value, 10);
+        updateAll(true);
+      });
+      el.sliderL.addEventListener('input', (e) => {
+        state.l_cm = parseFloat(e.target.value);
+        updateAll(true);
+      });
+      el.sliderAlpha.addEventListener('input', (e) => {
+        state.alpha = parseInt(e.target.value, 10);
+        updateAll(true);
+      });
+      el.inputG.addEventListener('change', (e) => {
+        const val = parseFloat(e.target.value);
+        state.g = isNaN(val) ? 9.80 : Math.min(10.0, Math.max(9.7, val));
+        e.target.value = state.g.toFixed(2);
+        updateAll(true);
+      });
+
+      // Data Table Buttons
+      el.btnRecord.addEventListener('click', recordMeasurement);
+      el.btnClearData.addEventListener('click', () => {
+        state.records = [];
+        renderDataTable();
+        renderGraph();
+        showToast('Đã xóa toàn bộ bảng số liệu.', 'info');
+      });
+
+      // Reset All
+      el.btnResetAll.addEventListener('click', () => {
+        state.currentStep = 1;
+        state.B_true = 0.045;
+        state.switchClosed = false;
+        state.direction = 1;
+        state.I = 1.00;
+        state.N = 100;
+        state.l_cm = 5.0;
+        state.alpha = 90;
+        state.g = 9.80;
+        state.tared = false;
+        state.coilLowered = true;
+        state.showLeftHand = false;
+        state.records = [];
+
+        el.sliderI.value = 1.00;
+        el.sliderN.value = 100;
+        el.sliderL.value = 5.0;
+        el.sliderAlpha.value = 90;
+        el.inputG.value = '9.80';
+
+        updateQuizUI();
+        renderStepper();
+        renderDataTable();
+        renderGraph();
+        updateAll(false);
+        showToast('Đã đặt lại toàn bộ thiết bị về trạng thái ban đầu.', 'info');
+      });
+
+      // =========================================================================
+      // 10. INITIALIZATION
+      // =========================================================================
+      window.addEventListener('load', () => {
+        renderStepper();
+        renderDataTable();
+        renderGraph();
+        updateAll(false);
+        updatePageNavDock();
+        // Kích hoạt giao diện mở đầu & hiệu ứng thành viên Tổ 2 ngay khi tải trang
+        playIntroAnimations();
+      });
+    })();
+  </script>
+</body>
+</html>
